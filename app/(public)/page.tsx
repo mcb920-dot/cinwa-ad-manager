@@ -256,9 +256,13 @@ export default async function HomePage() {
       <section className="bg-zinc-950 py-24 px-6 sm:px-10">
         <div className="max-w-6xl mx-auto">
 
+          {/* Section header */}
+          <h2 className="text-6xl sm:text-7xl lg:text-[5.5rem] font-black text-red-700 uppercase tracking-tight leading-[0.9] text-center mb-16">
+            Why CINWA?
+          </h2>
+
           {/* Anchor stat — the number that earns the room */}
           <div className="mb-16 pb-16 border-b border-zinc-800">
-            <p className="text-red-600 text-xs font-black uppercase tracking-[0.3em] mb-6">Why CINWA</p>
             <div className="flex flex-col lg:flex-row lg:items-end gap-8">
               <div className="shrink-0">
                 <p className="text-[clamp(5rem,14vw,9rem)] font-black text-white leading-none tracking-tight">17,000+</p>
