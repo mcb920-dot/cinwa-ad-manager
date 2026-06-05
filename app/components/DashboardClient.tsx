@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/src/lib/supabase'
 
 const PARTNER_LIMIT = 20
@@ -19,23 +19,54 @@ export type MonthStats = {
   coverSponsors: CoverSponsor[]
 }
 
-type Props = {
-  months: Month[]
-  categories: Category[]
-  initialMonthId: number | null
-  initialStats: MonthStats
+const EMPTY: MonthStats = {
+  partnerUsed: 0,
+  partnerRemaining: PARTNER_LIMIT,
+  coverUsed: 0,
+  coverRemaining: COVER_LIMIT,
+  partnerSpots: [],
+  coverSponsors: [],
 }
 
-export default function DashboardClient({ months, categories, initialMonthId, initialStats }: Props) {
-  const [selectedMonthId, setSelectedMonthId] = useState(initialMonthId)
-  const [stats, setStats] = useState(initialStats)
+export default function DashboardClient() {
+  const [months, setMonths] = useState<Month[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+  const [selectedMonthId, setSelectedMonthId] = useState<number | null>(null)
+  const [stats, setStats] = useState<MonthStats>(EMPTY)
   const [loading, setLoading] = useState(false)
+  const [ready, setReady] = useState(false)
 
-  const catMap = Object.fromEntries(categories.map((c) => [c.id, c.name]))
-  const selectedMonth = months.find((m) => m.id === selectedMonthId)
+  useEffect(() => {
+    async function init() {
+      const [{ data: monthData }, { data: catData }] = await Promise.all([
+        supabase
+          .from('months')
+          .select('id, name, active')
+          .eq('active', true)
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('categories')
+          .select('id, name')
+          .order('name'),
+      ])
 
-  async function handleMonthChange(monthId: number) {
-    setSelectedMonthId(monthId)
+      const loadedMonths = (monthData ?? []) as Month[]
+      setMonths(loadedMonths)
+      setCategories((catData ?? []) as Category[])
+
+      const firstId = loadedMonths[0]?.id ?? null
+      setSelectedMonthId(firstId)
+
+      if (firstId) {
+        await fetchStats(firstId)
+      }
+
+      setReady(true)
+    }
+    init()
+  }, [])
+
+  async function fetchStats(monthId: number) {
     setLoading(true)
     const [partnerCount, coverCount, partnerList, coverList] = await Promise.all([
       supabase.from('partner_spots').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('active', true),
@@ -56,6 +87,14 @@ export default function DashboardClient({ months, categories, initialMonthId, in
     setLoading(false)
   }
 
+  async function handleMonthChange(monthId: number) {
+    setSelectedMonthId(monthId)
+    await fetchStats(monthId)
+  }
+
+  const catMap = Object.fromEntries(categories.map((c) => [c.id, c.name]))
+  const selectedMonth = months.find((m) => m.id === selectedMonthId)
+
   return (
     <div className="flex flex-col min-h-full">
       {/* Page header */}
@@ -73,10 +112,11 @@ export default function DashboardClient({ months, categories, initialMonthId, in
           <select
             value={selectedMonthId ?? ''}
             onChange={(e) => handleMonthChange(Number(e.target.value))}
-            disabled={loading}
+            disabled={loading || !ready}
             className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-40 cursor-pointer"
           >
-            {months.length === 0 && <option value="">No months</option>}
+            {!ready && <option value="">Loading…</option>}
+            {ready && months.length === 0 && <option value="">No months</option>}
             {months.map((m) => (
               <option key={m.id} value={m.id}>{m.name}</option>
             ))}
@@ -165,7 +205,6 @@ function InventoryCard({ label, used, limit, remaining }: { label: string; used:
         <span className="text-4xl font-black tracking-tight text-zinc-900 leading-none">{used}</span>
         <span className="text-base text-zinc-300 font-semibold leading-none">/ {limit}</span>
       </div>
-      {/* Progress bar */}
       <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden mb-2.5">
         <div
           className={`h-full rounded-full transition-all ${full ? 'bg-red-500' : 'bg-zinc-800'}`}
