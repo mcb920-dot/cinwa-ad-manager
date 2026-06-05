@@ -41,16 +41,14 @@ async function getPageData() {
 
 export default async function HomePage() {
   const data = await getPageData()
-  const partnerOpen  = 20 - (data?.partnerCount ?? 0)
-  const coverCount   = data?.coverSponsors.length ?? 0
-  const coverOpen    = 4  - coverCount
-  const coverSlots   = Array.from({ length: 4 }, (_, i) => data?.coverSponsors[i] ?? null)
+  const partnerOpen = 20 - (data?.partnerCount ?? 0)
+  const coverOpen   = 4  - (data?.coverSponsors.length ?? 0)
+  const coverSlots  = Array.from({ length: 4 }, (_, i) => data?.coverSponsors[i] ?? null)
 
   return (
     <>
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <section className="relative flex items-center overflow-hidden py-28 sm:py-0 sm:h-[680px] lg:h-[750px]">
-        {/* Background image */}
         <Image
           src="/logo/Hero-photo.png"
           alt=""
@@ -59,9 +57,7 @@ export default async function HomePage() {
           priority
           quality={90}
         />
-        {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/45" />
-        {/* Content */}
         <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10">
           <p className="text-red-400 text-xs font-bold uppercase tracking-[0.25em] mb-6">
             Contractors in Northwest Arkansas
@@ -74,35 +70,38 @@ export default async function HomePage() {
             One business per category. Limited monthly placements.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link
-              href="/availability"
-              className="px-8 py-3.5 bg-red-700 text-white text-sm font-bold uppercase tracking-widest hover:bg-red-800 transition-colors"
-            >
+            <Link href="/availability" className="px-8 py-3.5 bg-red-700 text-white text-sm font-bold uppercase tracking-widest hover:bg-red-800 transition-colors">
               Check Availability
             </Link>
-            <Link
-              href="/reserve"
-              className="px-8 py-3.5 border border-white/40 text-white text-sm font-bold uppercase tracking-widest hover:border-white hover:bg-white/10 transition-colors"
-            >
+            <Link href="/reserve" className="px-8 py-3.5 border border-white/40 text-white text-sm font-bold uppercase tracking-widest hover:border-white hover:bg-white/10 transition-colors">
               Reserve a Spot
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── COVER SPONSOR ────────────────────────────────────────── */}
-      <section className="bg-white border-b border-zinc-200 py-16 px-6 sm:px-10">
+      {/* ── COVER SPONSORSHIP ────────────────────────────────────── */}
+      <section className="bg-white border-b border-zinc-200 py-20 px-6 sm:px-10">
         <div className="max-w-3xl mx-auto">
-          <p className="text-red-700 text-xs font-bold uppercase tracking-[0.25em] mb-4">
-            Cover Sponsorship
+
+          {/* Eyebrow */}
+          <p className="text-red-700 text-xs font-black uppercase tracking-[0.3em] mb-3">
+            Be Seen. Every Time.
           </p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-950 leading-tight mb-4">
-            This Is What Your Advertisement Looks Like
+
+          {/* Headline */}
+          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-950 leading-tight tracking-tight mb-5">
+            Your Business. Front and Center. All Month Long.
           </h2>
-          <p className="text-zinc-500 text-base leading-relaxed mb-8">
-            Premium placement on the most visible asset in the CINWA network — seen by
-            17,000+ members across Northwest Arkansas. Only 4 positions available per
-            monthly issue.
+
+          {/* Supporting copy */}
+          <p className="text-zinc-500 text-base leading-relaxed mb-2">
+            Think of it as a digital billboard inside one of Northwest Arkansas&apos; most active
+            contractor communities. Your business is displayed on the group&apos;s cover photo —
+            the first thing members see when visiting the page.
+          </p>
+          <p className="text-zinc-500 text-base leading-relaxed mb-10">
+            Only four positions are available each month.
           </p>
 
           {/* Cover image */}
@@ -118,35 +117,41 @@ export default async function HomePage() {
             />
           </div>
 
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 mb-4">
-            {data?.month.name ?? 'Current Month'} — Placements
+          {/* Premium inventory cards */}
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-400 mb-4">
+            {data?.month.name ?? 'Current Month'} — Cover Positions
           </p>
-          <div className="divide-y divide-zinc-100 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
             {coverSlots.map((sponsor, i) => (
-              <div key={i} className="flex items-center justify-between py-3.5">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-zinc-300 tabular-nums w-5">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  {sponsor
-                    ? <span className="text-sm font-semibold text-zinc-900">{sponsor.company_name}</span>
-                    : <span className="text-sm text-zinc-400 italic">Available</span>
-                  }
+              sponsor ? (
+                <div key={i} className="bg-zinc-950 border border-zinc-800 p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-2">
+                    Position {String(i + 1).padStart(2, '0')}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-white font-bold text-sm">{sponsor.company_name}</p>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-red-500 border border-red-800 px-2 py-0.5">
+                      Reserved
+                    </span>
+                  </div>
                 </div>
-                {!sponsor && (
-                  <Link href="/reserve" className="text-xs font-bold uppercase tracking-widest text-red-700 hover:underline">
+              ) : (
+                <div key={i} className="border border-dashed border-zinc-300 bg-zinc-50 p-5 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">
+                      Position {String(i + 1).padStart(2, '0')}
+                    </p>
+                    <p className="text-sm font-bold text-red-700">Available</p>
+                  </div>
+                  <Link
+                    href="/reserve"
+                    className="text-[11px] font-black uppercase tracking-widest text-white bg-red-700 px-4 py-2 hover:bg-red-800 transition-colors shrink-0"
+                  >
                     Reserve →
                   </Link>
-                )}
-              </div>
+                </div>
+              )
             ))}
-          </div>
-
-          <div className="space-y-2 text-sm text-zinc-500 mb-8">
-            <p>— Seen by 17,000+ members across Northwest Arkansas</p>
-            <p>— Print and digital distribution every month</p>
-            <p>— Only 4 sponsors per issue</p>
-            <p>— Sold separately from Featured Partner listing</p>
           </div>
 
           <Link
@@ -159,19 +164,23 @@ export default async function HomePage() {
       </section>
 
       {/* ── MONTHLY DIRECTORY ────────────────────────────────────── */}
-      <section className="bg-zinc-950 py-16 px-6 sm:px-10">
+      <section className="bg-zinc-950 py-20 px-6 sm:px-10">
         <div className="max-w-6xl mx-auto">
-          <p className="text-red-600 text-xs font-bold uppercase tracking-[0.25em] mb-4">
+
+          {/* Eyebrow */}
+          <p className="text-red-600 text-xs font-black uppercase tracking-[0.3em] mb-4">
             Monthly Featured Partner Directory
           </p>
+
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight">
-                See the Actual Monthly Featured Partner List
+              <h2 className="text-3xl sm:text-4xl font-bold text-white leading-tight max-w-2xl">
+                Connecting Homeowners With Trusted Local Professionals
               </h2>
-              <p className="text-zinc-400 text-base mt-3 max-w-xl">
-                One company per category. Real businesses. Real placement.
-                This goes to 17,000+ members every month.
+              <p className="text-zinc-400 text-base mt-4 max-w-2xl leading-relaxed">
+                One company per category. Real businesses. Real relationships. Building a stronger
+                contractor community across Northwest Arkansas while helping homeowners connect
+                with local professionals they can trust.
               </p>
             </div>
             <Link
@@ -182,7 +191,6 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Directory image — contained in a card, max-width 900px, centered */}
           <div className="max-w-[900px] mx-auto border border-zinc-700 bg-zinc-900 p-4">
             <Image
               src="/logo/PRO-JUNE-LIST.png"
@@ -196,16 +204,74 @@ export default async function HomePage() {
 
           <p className="text-zinc-500 text-sm mt-6">
             Every listed business is the exclusive representative of their category for the month.
-            {partnerOpen > 0 && data
-              ? ` ${partnerOpen} spots remain open for ${data.month.name}.`
-              : ''}
+            {partnerOpen > 0 && data ? ` ${partnerOpen} spots remain open for ${data.month.name}.` : ''}
           </p>
+        </div>
+      </section>
+
+      {/* ── WHY CINWA ────────────────────────────────────────────── */}
+      <section className="bg-white py-20 px-6 sm:px-10 border-b border-zinc-200">
+        <div className="max-w-6xl mx-auto">
+
+          {/* Eyebrow */}
+          <p className="text-red-700 text-xs font-black uppercase tracking-[0.3em] mb-4">
+            Why CINWA
+          </p>
+
+          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-950 leading-tight tracking-tight mb-6 max-w-3xl">
+            More Than Advertising. A Network Built for Northwest Arkansas.
+          </h2>
+
+          <div className="max-w-3xl mb-14 space-y-4">
+            <p className="text-zinc-500 text-base leading-relaxed">
+              Contractors in Northwest Arkansas was created to strengthen the connection between
+              homeowners and local professionals. What started as a Facebook community has grown
+              into a trusted network where homeowners discover reliable contractors and businesses
+              gain visibility, credibility, and opportunities to grow.
+            </p>
+            <p className="text-zinc-500 text-base leading-relaxed">
+              With more than 17,000 members and growing, CINWA is focused on supporting local
+              businesses, encouraging professional relationships, and helping homeowners make
+              confident decisions when hiring contractors.
+            </p>
+          </div>
+
+          {/* Pillar cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-zinc-950 p-7 border border-zinc-800">
+              <div className="w-8 h-0.5 bg-red-600 mb-5" />
+              <h3 className="text-white font-bold text-base mb-3 leading-snug">
+                Trusted Local Professionals
+              </h3>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                Connect with established businesses serving Northwest Arkansas homeowners every day.
+              </p>
+            </div>
+            <div className="bg-zinc-950 p-7 border border-zinc-800">
+              <div className="w-8 h-0.5 bg-red-600 mb-5" />
+              <h3 className="text-white font-bold text-base mb-3 leading-snug">
+                Visibility That Matters
+              </h3>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                Get your business in front of an engaged audience actively seeking local services.
+              </p>
+            </div>
+            <div className="bg-zinc-950 p-7 border border-zinc-800">
+              <div className="w-8 h-0.5 bg-red-600 mb-5" />
+              <h3 className="text-white font-bold text-base mb-3 leading-snug">
+                Built on Community
+              </h3>
+              <p className="text-zinc-400 text-sm leading-relaxed">
+                Strengthening relationships between contractors, homeowners, suppliers, and local businesses.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ── LIVE AVAILABILITY ────────────────────────────────────── */}
       {data && (
-        <section className="bg-white border-t border-zinc-200 py-16 px-6 sm:px-10">
+        <section className="bg-white py-16 px-6 sm:px-10">
           <div className="max-w-6xl mx-auto">
             <p className="text-red-700 text-xs font-bold uppercase tracking-[0.25em] mb-3">
               Live Inventory
@@ -219,7 +285,6 @@ export default async function HomePage() {
               {coverOpen} of 4 Cover Sponsor slots remain open.
             </p>
 
-            {/* Category list — no boxes, just names */}
             <div className="mb-6">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 mb-5">
                 Available Categories ({data.available.length})
@@ -269,16 +334,10 @@ export default async function HomePage() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-            <Link
-              href="/reserve"
-              className="px-8 py-4 bg-white text-red-700 text-sm font-bold uppercase tracking-widest text-center hover:bg-zinc-100 transition-colors"
-            >
+            <Link href="/reserve" className="px-8 py-4 bg-white text-red-700 text-sm font-bold uppercase tracking-widest text-center hover:bg-zinc-100 transition-colors">
               Reserve a Spot
             </Link>
-            <Link
-              href="/availability"
-              className="px-8 py-4 border-2 border-white text-white text-sm font-bold uppercase tracking-widest text-center hover:bg-red-800 transition-colors"
-            >
+            <Link href="/availability" className="px-8 py-4 border-2 border-white text-white text-sm font-bold uppercase tracking-widest text-center hover:bg-red-800 transition-colors">
               Check Availability
             </Link>
           </div>
