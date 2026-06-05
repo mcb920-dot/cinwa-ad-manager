@@ -52,7 +52,7 @@ export default async function HomePage() {
       <section className="relative flex items-center overflow-hidden py-28 sm:py-0 sm:h-[680px] lg:h-[750px]">
         {/* Background image */}
         <Image
-          src="/logo/hero-photo.png"
+          src="/logo/Hero-photo.png"
           alt=""
           fill
           className="object-cover object-center"
