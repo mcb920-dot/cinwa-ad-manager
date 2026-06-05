@@ -35,6 +35,14 @@ export default async function Dashboard() {
         </div>
         <div className="p-4 space-y-2">
           <Row label="NEXT_PUBLIC_SUPABASE_URL exists" value={url ? 'YES' : 'NO'} ok={!!url} />
+          <Row label="URL length" value={url ? String(url.length) : 'n/a'} />
+          <Row label="URL startsWith https://" value={url ? String(url.startsWith('https://')) : 'n/a'} ok={url?.startsWith('https://')} />
+          <Row label="URL endsWith .supabase.co" value={url ? String(url.endsWith('.supabase.co')) : 'n/a'} ok={url?.endsWith('.supabase.co')} />
+          <Row label="URL contains /rest/v1" value={url ? String(url.includes('/rest/v1')) : 'n/a'} />
+          <Row label="URL contains spaces" value={url ? String(url.includes(' ')) : 'n/a'} ok={url ? !url.includes(' ') : undefined} />
+          <Row label="URL first 20 chars" value={url ? url.slice(0, 20) : 'n/a'} />
+          <Row label="URL last 20 chars" value={url ? url.slice(-20) : 'n/a'} />
+          <div className="pt-1 border-t border-zinc-200" />
           <Row label="NEXT_PUBLIC_SUPABASE_ANON_KEY exists" value={key ? 'YES' : 'NO'} ok={!!key} />
           <div className="pt-1 border-t border-zinc-200" />
           <Row label="Query" value={query} />
