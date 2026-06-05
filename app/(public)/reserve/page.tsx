@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js'
 import ReserveClient from '../../components/ReserveClient'
 import type { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Reserve a Spot — CINWA',
   description: 'Reserve your advertising spot in the CINWA contractor directory.',
