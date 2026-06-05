@@ -49,16 +49,38 @@ export default async function HomePage() {
   return (
     <>
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      {/* DIAGNOSTIC: bare image only, no overlays */}
-      <section className="relative" style={{ height: '680px' }}>
+      <section className="relative overflow-hidden" style={{ height: 'clamp(580px, 75vh, 800px)' }}>
         <Image
           src="/logo/Hero-photo.png"
-          alt="Hero"
+          alt=""
           fill
           priority
-          className="object-cover"
           sizes="100vw"
+          className="object-cover object-center"
         />
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full max-w-6xl mx-auto px-6 sm:px-10">
+            <p className="text-red-400 text-xs font-black uppercase tracking-[0.3em] mb-6">
+              Contractors in Northwest Arkansas
+            </p>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.0] tracking-tight mb-6 max-w-4xl uppercase">
+              Reach 17,000+ Northwest Arkansas Homeowners &amp; Contractors
+            </h1>
+            <p className="text-white/70 text-lg leading-relaxed max-w-2xl mb-10">
+              Exclusive advertising inside the region&apos;s largest contractor community.
+              One business per category. Limited monthly placements.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link href="/availability" className="px-8 py-3.5 bg-red-700 text-white text-sm font-black uppercase tracking-widest hover:bg-red-800 transition-colors">
+                Check Availability
+              </Link>
+              <Link href="/reserve" className="px-8 py-3.5 border border-white/40 text-white text-sm font-black uppercase tracking-widest hover:border-white hover:bg-white/10 transition-colors">
+                Reserve a Spot
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ── COVER SPONSORSHIP ────────────────────────────────────── */}
@@ -231,48 +253,81 @@ export default async function HomePage() {
       </section>
 
       {/* ── WHY CINWA ────────────────────────────────────────────── */}
-      <section className="bg-white py-24 px-6 sm:px-10 border-b border-zinc-200">
+      <section className="bg-zinc-950 py-24 px-6 sm:px-10">
         <div className="max-w-6xl mx-auto">
 
-          <p className="text-red-700 text-xs font-black uppercase tracking-[0.3em] mb-5">
-            Why CINWA
-          </p>
-
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-zinc-950 uppercase tracking-tight leading-[0.95] mb-10 max-w-4xl">
-            More Than Advertising.<br />
-            A Network Built for<br className="hidden sm:block" /> Northwest Arkansas.
-          </h2>
-
-          <div className="max-w-3xl mb-16 space-y-5">
-            <p className="text-zinc-500 text-base sm:text-lg leading-relaxed">
-              Contractors in Northwest Arkansas was created to strengthen the connection between
-              homeowners and local professionals. What started as a Facebook community has grown
-              into a trusted network where businesses gain visibility, homeowners discover reliable
-              professionals, and local relationships continue to grow.
-            </p>
-            <p className="text-zinc-500 text-base sm:text-lg leading-relaxed">
-              With more than 17,000 members and growing, CINWA is focused on supporting local
-              businesses, encouraging professional relationships, and helping homeowners make
-              confident decisions when hiring contractors.
-            </p>
+          {/* Anchor stat — the number that earns the room */}
+          <div className="mb-16 pb-16 border-b border-zinc-800">
+            <p className="text-red-600 text-xs font-black uppercase tracking-[0.3em] mb-6">Why CINWA</p>
+            <div className="flex flex-col lg:flex-row lg:items-end gap-8">
+              <div className="shrink-0">
+                <p className="text-[clamp(5rem,14vw,9rem)] font-black text-white leading-none tracking-tight">17,000+</p>
+                <p className="text-2xl sm:text-3xl font-black uppercase text-red-700 tracking-tight leading-tight mt-2">
+                  Northwest Arkansas<br />Members.
+                </p>
+              </div>
+              <div className="max-w-xl lg:mb-4">
+                <p className="text-zinc-300 text-lg sm:text-xl leading-relaxed font-medium">
+                  That&apos;s your audience. Homeowners actively looking for contractors.
+                  Contractors looking for trusted professionals. All of them inside one community,
+                  built specifically for Northwest Arkansas.
+                </p>
+                <p className="text-zinc-500 text-base mt-4 leading-relaxed">
+                  Not a national ad platform. Not a generic directory.
+                  A local network that has been running and growing for years.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Stat / feature cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-zinc-200 border border-zinc-200">
-            {[
-              { metric: '17,000+', label: 'Members', sub: 'Active homeowners & contractors' },
-              { metric: '1',       label: 'Per Category', sub: 'Exclusive placement every month' },
-              { metric: 'Local',   label: 'Visibility', sub: 'Reach NWA homeowners directly' },
-              { metric: 'Trusted', label: 'Community', sub: 'Built on real relationships' },
-              { metric: 'Monthly', label: 'Exposure', sub: 'Fresh placement every cycle' },
-              { metric: 'NWA',     label: 'Contractor Network', sub: 'The region\'s go-to resource' },
-            ].map(({ metric, label, sub }) => (
-              <div key={label} className="bg-zinc-950 p-6 sm:p-8">
-                <p className="text-3xl sm:text-4xl font-black text-white leading-none mb-1">{metric}</p>
-                <p className="text-xs font-black uppercase tracking-widest text-red-600 mb-2">{label}</p>
-                <p className="text-zinc-500 text-xs leading-relaxed">{sub}</p>
+          {/* Three value propositions — horizontal rule style */}
+          <div className="space-y-0 divide-y divide-zinc-800">
+
+            <div className="py-10 flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-16">
+              <div className="shrink-0 w-full sm:w-64">
+                <p className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight leading-tight">
+                  One Business<br />Per Category.
+                </p>
               </div>
-            ))}
+              <div className="flex-1">
+                <p className="text-zinc-400 text-base sm:text-lg leading-relaxed">
+                  Reserve your category and you own it for the month. No other roofers. No other
+                  plumbers. No competing bids for the same homeowner. When a category fills,
+                  it closes — and that spot has your name on it.
+                </p>
+              </div>
+            </div>
+
+            <div className="py-10 flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-16">
+              <div className="shrink-0 w-full sm:w-64">
+                <p className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight leading-tight">
+                  Seen All<br />Month Long.
+                </p>
+              </div>
+              <div className="flex-1">
+                <p className="text-zinc-400 text-base sm:text-lg leading-relaxed">
+                  This isn&apos;t a 3-second banner ad. Your business appears on the community
+                  cover photo and partner list every time a member visits — all month.
+                  Repeat exposure builds the kind of trust that turns into a phone call.
+                </p>
+              </div>
+            </div>
+
+            <div className="py-10 flex flex-col sm:flex-row sm:items-start gap-6 sm:gap-16">
+              <div className="shrink-0 w-full sm:w-64">
+                <p className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight leading-tight">
+                  Built for<br />This Market.
+                </p>
+              </div>
+              <div className="flex-1">
+                <p className="text-zinc-400 text-base sm:text-lg leading-relaxed">
+                  CINWA was built from the ground up for Northwest Arkansas contractors and
+                  homeowners. Not imported. Not national. Every member in this group is your
+                  neighbor — and a potential customer.
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
