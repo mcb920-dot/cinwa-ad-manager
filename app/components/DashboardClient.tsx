@@ -57,21 +57,24 @@ export default function DashboardClient({ months, categories, initialMonthId, in
   }
 
   return (
-    <div className="p-8 space-y-8">
-      <div className="flex items-start justify-between">
+    <div className="flex flex-col min-h-full">
+      {/* Page header */}
+      <div className="px-8 py-5 bg-white border-b border-zinc-200 flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-zinc-900">Dashboard</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
-            {selectedMonth ? selectedMonth.name : '—'}
-          </p>
+          <h1 className="text-xl font-bold tracking-tight text-zinc-900">Dashboard</h1>
+          {selectedMonth && (
+            <p className="text-xs text-zinc-400 mt-0.5 font-medium uppercase tracking-wide">
+              {selectedMonth.name}
+            </p>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-zinc-600 whitespace-nowrap">Viewing month</label>
+        <div className="flex items-center gap-2.5">
+          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Month</span>
           <select
             value={selectedMonthId ?? ''}
             onChange={(e) => handleMonthChange(Number(e.target.value))}
             disabled={loading}
-            className="rounded-md border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent disabled:opacity-40 cursor-pointer"
           >
             {months.length === 0 && <option value="">No months</option>}
             {months.map((m) => (
@@ -81,95 +84,118 @@ export default function DashboardClient({ months, categories, initialMonthId, in
         </div>
       </div>
 
-      <div className={`grid grid-cols-2 gap-4 transition-opacity duration-150 ${loading ? 'opacity-40 pointer-events-none' : ''}`}>
-        <InventoryCard label="Partner Spots" used={stats.partnerUsed} limit={PARTNER_LIMIT} remaining={stats.partnerRemaining} />
-        <InventoryCard label="Cover Sponsors" used={stats.coverUsed} limit={COVER_LIMIT} remaining={stats.coverRemaining} />
+      <div className={`p-8 space-y-8 transition-opacity duration-150 ${loading ? 'opacity-40 pointer-events-none' : ''}`}>
+        {/* Inventory cards */}
+        <div className="grid grid-cols-2 gap-4">
+          <InventoryCard label="Partner Spots" used={stats.partnerUsed} limit={PARTNER_LIMIT} remaining={stats.partnerRemaining} />
+          <InventoryCard label="Cover Sponsors" used={stats.coverUsed} limit={COVER_LIMIT} remaining={stats.coverRemaining} />
+        </div>
+
+        {/* Partner Spots table */}
+        <section>
+          <SectionHeader title="Partner Spots" month={selectedMonth?.name} />
+          <div className="bg-white rounded-lg border border-zinc-200 overflow-hidden">
+            {stats.partnerSpots.length === 0 ? (
+              <EmptyState text="No partner spots for this month." />
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="border-b border-zinc-200">
+                  <tr className="bg-zinc-50">
+                    {['Company', 'Category', 'Paid', 'Active'].map((h) => (
+                      <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100">
+                  {stats.partnerSpots.map((s) => (
+                    <tr key={s.id} className="hover:bg-zinc-50/70 transition-colors">
+                      <td className="px-4 py-2 font-semibold text-zinc-800 text-[13px]">{s.company_name}</td>
+                      <td className="px-4 py-2 text-zinc-500 text-[13px]">{catMap[s.category_id] ?? `#${s.category_id}`}</td>
+                      <td className="px-4 py-2"><Badge on={s.paid} yes="Paid" no="Unpaid" /></td>
+                      <td className="px-4 py-2"><Badge on={s.active} yes="Active" no="Inactive" /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </section>
+
+        {/* Cover Sponsors table */}
+        <section>
+          <SectionHeader title="Cover Sponsors" month={selectedMonth?.name} />
+          <div className="bg-white rounded-lg border border-zinc-200 overflow-hidden">
+            {stats.coverSponsors.length === 0 ? (
+              <EmptyState text="No cover sponsors for this month." />
+            ) : (
+              <table className="w-full text-sm">
+                <thead className="border-b border-zinc-200">
+                  <tr className="bg-zinc-50">
+                    {['Company', 'Position', 'Paid', 'Active'].map((h) => (
+                      <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-100">
+                  {stats.coverSponsors.map((s) => (
+                    <tr key={s.id} className="hover:bg-zinc-50/70 transition-colors">
+                      <td className="px-4 py-2 font-semibold text-zinc-800 text-[13px]">{s.company_name}</td>
+                      <td className="px-4 py-2 text-zinc-500 text-[13px]">{s.position}</td>
+                      <td className="px-4 py-2"><Badge on={s.paid} yes="Paid" no="Unpaid" /></td>
+                      <td className="px-4 py-2"><Badge on={s.active} yes="Active" no="Inactive" /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </section>
       </div>
-
-      <section>
-        <h2 className="text-sm font-semibold text-zinc-700 mb-3">
-          Partner Spots — {selectedMonth?.name ?? ''}
-        </h2>
-        <div className={`bg-white rounded-xl border border-zinc-200 overflow-hidden transition-opacity duration-150 ${loading ? 'opacity-40' : ''}`}>
-          {stats.partnerSpots.length === 0 ? (
-            <p className="p-6 text-center text-sm text-zinc-400">No partner spots for this month.</p>
-          ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-zinc-50 border-b border-zinc-200">
-                <tr>
-                  {['Company', 'Category', 'Paid', 'Active'].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wide">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100">
-                {stats.partnerSpots.map((s) => (
-                  <tr key={s.id} className="hover:bg-zinc-50">
-                    <td className="px-4 py-2.5 font-medium">{s.company_name}</td>
-                    <td className="px-4 py-2.5 text-zinc-500">{catMap[s.category_id] ?? `#${s.category_id}`}</td>
-                    <td className="px-4 py-2.5"><Badge on={s.paid} yes="Paid" no="Unpaid" /></td>
-                    <td className="px-4 py-2.5"><Badge on={s.active} yes="Active" no="Inactive" /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-sm font-semibold text-zinc-700 mb-3">
-          Cover Sponsors — {selectedMonth?.name ?? ''}
-        </h2>
-        <div className={`bg-white rounded-xl border border-zinc-200 overflow-hidden transition-opacity duration-150 ${loading ? 'opacity-40' : ''}`}>
-          {stats.coverSponsors.length === 0 ? (
-            <p className="p-6 text-center text-sm text-zinc-400">No cover sponsors for this month.</p>
-          ) : (
-            <table className="w-full text-sm">
-              <thead className="bg-zinc-50 border-b border-zinc-200">
-                <tr>
-                  {['Company', 'Position', 'Paid', 'Active'].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wide">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100">
-                {stats.coverSponsors.map((s) => (
-                  <tr key={s.id} className="hover:bg-zinc-50">
-                    <td className="px-4 py-2.5 font-medium">{s.company_name}</td>
-                    <td className="px-4 py-2.5 text-zinc-500">{s.position}</td>
-                    <td className="px-4 py-2.5"><Badge on={s.paid} yes="Paid" no="Unpaid" /></td>
-                    <td className="px-4 py-2.5"><Badge on={s.active} yes="Active" no="Inactive" /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </section>
     </div>
   )
 }
 
 function InventoryCard({ label, used, limit, remaining }: { label: string; used: number; limit: number; remaining: number }) {
+  const pct = Math.round((used / limit) * 100)
   const full = remaining === 0
   return (
-    <div className={`rounded-xl border p-6 ${full ? 'bg-red-50 border-red-200' : 'bg-white border-zinc-200'}`}>
-      <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{label}</p>
-      <p className="text-3xl font-bold text-zinc-900 leading-none">
-        {used} <span className="text-lg font-normal text-zinc-400">/ {limit}</span>
-      </p>
-      <p className={`text-sm mt-2 font-medium ${full ? 'text-red-600' : 'text-zinc-500'}`}>
+    <div className="bg-white rounded-lg border border-zinc-200 p-5">
+      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3">{label}</p>
+      <div className="flex items-baseline gap-1.5 mb-3">
+        <span className="text-4xl font-black tracking-tight text-zinc-900 leading-none">{used}</span>
+        <span className="text-base text-zinc-300 font-semibold leading-none">/ {limit}</span>
+      </div>
+      {/* Progress bar */}
+      <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden mb-2.5">
+        <div
+          className={`h-full rounded-full transition-all ${full ? 'bg-red-500' : 'bg-zinc-800'}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <p className={`text-xs font-semibold ${full ? 'text-red-500' : 'text-zinc-400'}`}>
         {full ? 'No spots remaining' : `${remaining} remaining`}
       </p>
     </div>
   )
 }
 
+function SectionHeader({ title, month }: { title: string; month?: string }) {
+  return (
+    <div className="flex items-baseline gap-2 mb-3">
+      <h2 className="text-sm font-bold text-zinc-800">{title}</h2>
+      {month && <span className="text-xs text-zinc-400 font-medium">{month}</span>}
+    </div>
+  )
+}
+
+function EmptyState({ text }: { text: string }) {
+  return <p className="py-10 text-center text-xs text-zinc-400 font-medium">{text}</p>
+}
+
 function Badge({ on, yes, no }: { on: boolean; yes: string; no: string }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-      on ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-500'
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold ${
+      on ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-400'
     }`}>
       {on ? yes : no}
     </span>

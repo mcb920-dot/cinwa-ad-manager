@@ -49,15 +49,27 @@ export default async function HomePage() {
   return (
     <>
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="bg-zinc-950 border-t-4 border-red-700">
-        <div className="max-w-6xl mx-auto px-6 sm:px-10 py-24 sm:py-32">
-          <p className="text-red-600 text-xs font-bold uppercase tracking-[0.25em] mb-6">
+      <section className="relative flex items-center overflow-hidden py-28 sm:py-0 sm:h-[680px] lg:h-[750px]">
+        {/* Background image */}
+        <Image
+          src="/logo/hero-photo.png"
+          alt=""
+          fill
+          className="object-cover object-center"
+          priority
+          quality={90}
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/45" />
+        {/* Content */}
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10">
+          <p className="text-red-400 text-xs font-bold uppercase tracking-[0.25em] mb-6">
             Contractors in Northwest Arkansas
           </p>
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.04] tracking-tight mb-6 max-w-4xl">
             Reach 17,000+ Northwest Arkansas Homeowners &amp; Contractors
           </h1>
-          <p className="text-zinc-400 text-lg leading-relaxed max-w-2xl mb-10">
+          <p className="text-white/70 text-lg leading-relaxed max-w-2xl mb-10">
             Exclusive advertising inside the region&apos;s largest contractor community.
             One business per category. Limited monthly placements.
           </p>
@@ -70,7 +82,7 @@ export default async function HomePage() {
             </Link>
             <Link
               href="/reserve"
-              className="px-8 py-3.5 border border-zinc-600 text-zinc-300 text-sm font-bold uppercase tracking-widest hover:border-zinc-400 hover:text-white transition-colors"
+              className="px-8 py-3.5 border border-white/40 text-white text-sm font-bold uppercase tracking-widest hover:border-white hover:bg-white/10 transition-colors"
             >
               Reserve a Spot
             </Link>
@@ -80,78 +92,69 @@ export default async function HomePage() {
 
       {/* ── COVER SPONSOR ────────────────────────────────────────── */}
       <section className="bg-white border-b border-zinc-200 py-16 px-6 sm:px-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
+        <div className="max-w-3xl mx-auto">
+          <p className="text-red-700 text-xs font-bold uppercase tracking-[0.25em] mb-4">
+            Cover Sponsorship
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-950 leading-tight mb-4">
+            This Is What Your Advertisement Looks Like
+          </h2>
+          <p className="text-zinc-500 text-base leading-relaxed mb-8">
+            Premium placement on the most visible asset in the CINWA network — seen by
+            17,000+ members across Northwest Arkansas. Only 4 positions available per
+            monthly issue.
+          </p>
 
-            {/* Left: text + sponsor slots */}
-            <div>
-              <p className="text-red-700 text-xs font-bold uppercase tracking-[0.25em] mb-4">
-                Cover Sponsorship
-              </p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-zinc-950 leading-tight mb-4">
-                This Is What Your Advertisement Looks Like
-              </h2>
-              <p className="text-zinc-500 text-base leading-relaxed mb-8">
-                Premium placement on the most visible asset in the CINWA network — seen by
-                17,000+ members across Northwest Arkansas. Only 4 positions available per
-                monthly issue.
-              </p>
-
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 mb-4">
-                {data?.month.name ?? 'Current Month'} — Placements
-              </p>
-              <div className="divide-y divide-zinc-100 mb-8">
-                {coverSlots.map((sponsor, i) => (
-                  <div key={i} className="flex items-center justify-between py-3.5">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-zinc-300 tabular-nums w-5">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      {sponsor
-                        ? <span className="text-sm font-semibold text-zinc-900">{sponsor.company_name}</span>
-                        : <span className="text-sm text-zinc-400 italic">Available</span>
-                      }
-                    </div>
-                    {!sponsor && (
-                      <Link href="/reserve" className="text-xs font-bold uppercase tracking-widest text-red-700 hover:underline">
-                        Reserve →
-                      </Link>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="space-y-2 text-sm text-zinc-500 mb-8">
-                <p>— Seen by 17,000+ members across Northwest Arkansas</p>
-                <p>— Print and digital distribution every month</p>
-                <p>— Only 4 sponsors per issue</p>
-                <p>— Sold separately from Featured Partner listing</p>
-              </div>
-
-              <Link
-                href="/reserve"
-                className="inline-block px-7 py-3 bg-zinc-950 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-colors"
-              >
-                Reserve Cover Sponsorship
-              </Link>
-            </div>
-
-            {/* Right: cover image, contained in a card */}
-            <div className="border border-zinc-200 bg-zinc-50 p-4">
-              <div className="w-full max-w-[600px] mx-auto">
-                <Image
-                  src="/logo/NEWJUNECOVERPHOTO.png"
-                  alt="CINWA Cover Sponsor — Monthly Community Cover"
-                  width={1731}
-                  height={909}
-                  className="w-full h-auto object-contain"
-                  quality={90}
-                  priority
-                />
-              </div>
-            </div>
-
+          {/* Cover image */}
+          <div className="border border-zinc-200 bg-zinc-50 p-4 mb-10">
+            <Image
+              src="/logo/NEWJUNECOVERPHOTO.png"
+              alt="CINWA Cover Sponsor — Monthly Community Cover"
+              width={1731}
+              height={909}
+              className="w-full h-auto object-contain"
+              quality={90}
+              priority
+            />
           </div>
+
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 mb-4">
+            {data?.month.name ?? 'Current Month'} — Placements
+          </p>
+          <div className="divide-y divide-zinc-100 mb-8">
+            {coverSlots.map((sponsor, i) => (
+              <div key={i} className="flex items-center justify-between py-3.5">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-zinc-300 tabular-nums w-5">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  {sponsor
+                    ? <span className="text-sm font-semibold text-zinc-900">{sponsor.company_name}</span>
+                    : <span className="text-sm text-zinc-400 italic">Available</span>
+                  }
+                </div>
+                {!sponsor && (
+                  <Link href="/reserve" className="text-xs font-bold uppercase tracking-widest text-red-700 hover:underline">
+                    Reserve →
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-2 text-sm text-zinc-500 mb-8">
+            <p>— Seen by 17,000+ members across Northwest Arkansas</p>
+            <p>— Print and digital distribution every month</p>
+            <p>— Only 4 sponsors per issue</p>
+            <p>— Sold separately from Featured Partner listing</p>
+          </div>
+
+          <Link
+            href="/reserve"
+            className="inline-block px-7 py-3 bg-zinc-950 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-colors"
+          >
+            Reserve Cover Sponsorship
+          </Link>
         </div>
       </section>
 

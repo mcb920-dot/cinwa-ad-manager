@@ -13,13 +13,12 @@ export default async function Dashboard() {
   )
 
   const [{ data: months }, { data: categories }] = await Promise.all([
-    db.from('months').select('id, name, active').order('created_at', { ascending: true }),
+    db.from('months').select('id, name, active').eq('active', true).order('created_at', { ascending: true }),
     db.from('categories').select('id, name').order('name'),
   ])
 
   const allMonths = months ?? []
-  const firstActive = allMonths.find((m) => m.active) ?? null
-  const initialMonthId = firstActive?.id ?? null
+  const initialMonthId = allMonths[0]?.id ?? null
 
   const EMPTY: MonthStats = {
     partnerUsed: 0,

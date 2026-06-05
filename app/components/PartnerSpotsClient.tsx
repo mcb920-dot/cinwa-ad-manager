@@ -33,7 +33,7 @@ const EMPTY = {
   active: true,
 }
 
-const INPUT = 'w-full rounded-md border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+const INPUT = 'w-full rounded-md border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-white'
 const COLS = ['Month', 'Category', 'Company', 'Contact', 'Email', 'Phone', 'Paid', 'Active']
 
 export default function PartnerSpotsClient({ spots: initial, months, categories }: Props) {
@@ -96,27 +96,29 @@ export default function PartnerSpotsClient({ spots: initial, months, categories 
 
   return (
     <>
-      <div className="px-8 py-5 border-b border-zinc-200 bg-white flex items-center justify-between">
-        <h1 className="text-lg font-semibold text-zinc-900">Partner Spots</h1>
+      {/* Header */}
+      <div className="px-8 py-5 bg-white border-b border-zinc-200 flex items-center justify-between">
+        <h1 className="text-xl font-bold tracking-tight text-zinc-900">Partner Spots</h1>
         <button
           onClick={() => setOpen(true)}
-          className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-4 py-1.5 bg-red-600 text-white text-[13px] font-semibold rounded-md hover:bg-red-700 transition-colors"
         >
           Add Partner Spot
         </button>
       </div>
 
+      {/* Table */}
       <div className="p-8">
-        <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden">
+        <div className="bg-white rounded-lg border border-zinc-200 overflow-hidden">
           {spots.length === 0 ? (
-            <p className="p-10 text-center text-sm text-zinc-400">No partner spots yet.</p>
+            <p className="py-10 text-center text-xs text-zinc-400 font-medium">No partner spots yet.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-zinc-50 border-b border-zinc-200">
-                  <tr>
+                <thead className="border-b border-zinc-200">
+                  <tr className="bg-zinc-50">
                     {COLS.map((h) => (
-                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wide whitespace-nowrap">
+                      <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-zinc-400 uppercase tracking-widest whitespace-nowrap">
                         {h}
                       </th>
                     ))}
@@ -124,15 +126,15 @@ export default function PartnerSpotsClient({ spots: initial, months, categories 
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
                   {spots.map((spot) => (
-                    <tr key={spot.id} className="hover:bg-zinc-50 transition-colors">
-                      <td className="px-4 py-3 whitespace-nowrap">{monthMap[spot.month_id] ?? spot.month_id}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">{catMap[spot.category_id] ?? spot.category_id}</td>
-                      <td className="px-4 py-3 font-medium whitespace-nowrap">{spot.company_name}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">{spot.contact_name}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">{spot.email}</td>
-                      <td className="px-4 py-3 whitespace-nowrap">{spot.phone}</td>
-                      <td className="px-4 py-3"><Badge on={spot.paid} yes="Paid" no="Unpaid" /></td>
-                      <td className="px-4 py-3"><Badge on={spot.active} yes="Active" no="Inactive" /></td>
+                    <tr key={spot.id} className="hover:bg-zinc-50/70 transition-colors">
+                      <td className="px-4 py-2 text-[13px] text-zinc-500 whitespace-nowrap">{monthMap[spot.month_id] ?? spot.month_id}</td>
+                      <td className="px-4 py-2 text-[13px] text-zinc-500 whitespace-nowrap">{catMap[spot.category_id] ?? spot.category_id}</td>
+                      <td className="px-4 py-2 text-[13px] font-semibold text-zinc-800 whitespace-nowrap">{spot.company_name}</td>
+                      <td className="px-4 py-2 text-[13px] text-zinc-500 whitespace-nowrap">{spot.contact_name}</td>
+                      <td className="px-4 py-2 text-[13px] text-zinc-500 whitespace-nowrap">{spot.email}</td>
+                      <td className="px-4 py-2 text-[13px] text-zinc-500 whitespace-nowrap">{spot.phone}</td>
+                      <td className="px-4 py-2"><Badge on={spot.paid} yes="Paid" no="Unpaid" /></td>
+                      <td className="px-4 py-2"><Badge on={spot.active} yes="Active" no="Inactive" /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -142,12 +144,13 @@ export default function PartnerSpotsClient({ spots: initial, months, categories 
         </div>
       </div>
 
+      {/* Modal */}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200">
-              <h2 className="text-base font-semibold text-zinc-900">Add Partner Spot</h2>
-              <button onClick={closeModal} className="text-zinc-400 hover:text-zinc-600 text-lg leading-none">×</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100">
+              <h2 className="text-base font-bold tracking-tight text-zinc-900">Add Partner Spot</h2>
+              <button onClick={closeModal} className="w-7 h-7 flex items-center justify-center rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors text-lg leading-none">×</button>
             </div>
             <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -193,23 +196,23 @@ export default function PartnerSpotsClient({ spots: initial, months, categories 
                 <input type="text" value={form.facebook_url} onChange={(e) => set('facebook_url', e.target.value)} className={INPUT} />
               </div>
               <div className="flex gap-6 pt-1">
-                <label className="flex items-center gap-2 text-sm text-zinc-700 cursor-pointer">
-                  <input type="checkbox" checked={form.paid} onChange={(e) => set('paid', e.target.checked)} className="w-4 h-4 rounded" />
+                <label className="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer select-none">
+                  <input type="checkbox" checked={form.paid} onChange={(e) => set('paid', e.target.checked)} className="w-4 h-4 rounded accent-red-600" />
                   Paid
                 </label>
-                <label className="flex items-center gap-2 text-sm text-zinc-700 cursor-pointer">
-                  <input type="checkbox" checked={form.active} onChange={(e) => set('active', e.target.checked)} className="w-4 h-4 rounded" />
+                <label className="flex items-center gap-2 text-sm text-zinc-600 cursor-pointer select-none">
+                  <input type="checkbox" checked={form.active} onChange={(e) => set('active', e.target.checked)} className="w-4 h-4 rounded accent-red-600" />
                   Active
                 </label>
               </div>
               {error && (
-                <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+                <p className="text-[13px] text-red-600 bg-red-50 border border-red-100 rounded-md px-3 py-2">{error}</p>
               )}
-              <div className="flex justify-end gap-3 pt-2 border-t border-zinc-100">
-                <button type="button" onClick={closeModal} className="px-4 py-2 text-sm border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">
+              <div className="flex justify-end gap-2 pt-2 border-t border-zinc-100">
+                <button type="button" onClick={closeModal} className="px-4 py-1.5 text-[13px] font-medium border border-zinc-200 rounded-md hover:bg-zinc-50 transition-colors text-zinc-600">
                   Cancel
                 </button>
-                <button type="submit" disabled={loading} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                <button type="submit" disabled={loading} className="px-4 py-1.5 text-[13px] font-semibold bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 transition-colors">
                   {loading ? 'Saving…' : 'Save'}
                 </button>
               </div>
@@ -223,8 +226,8 @@ export default function PartnerSpotsClient({ spots: initial, months, categories 
 
 function Badge({ on, yes, no }: { on: boolean; yes: string; no: string }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-      on ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-500'
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold ${
+      on ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-400'
     }`}>
       {on ? yes : no}
     </span>
@@ -233,7 +236,7 @@ function Badge({ on, yes, no }: { on: boolean; yes: string; no: string }) {
 
 function Label({ text, required }: { text: string; required?: boolean }) {
   return (
-    <label className="block text-xs font-medium text-zinc-700 mb-1">
+    <label className="block text-[11px] font-bold text-zinc-500 uppercase tracking-wide mb-1.5">
       {text}{required && <span className="text-red-500 ml-0.5">*</span>}
     </label>
   )
