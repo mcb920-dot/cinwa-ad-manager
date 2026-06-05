@@ -60,18 +60,18 @@ export default async function HomePage() {
         />
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full max-w-6xl mx-auto px-6 sm:px-10">
+          <div className="w-full max-w-5xl mx-auto px-6 sm:px-10 text-center">
             <p className="text-red-400 text-xs font-black uppercase tracking-[0.3em] mb-6">
               Contractors in Northwest Arkansas
             </p>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.0] tracking-tight mb-6 max-w-4xl uppercase">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.0] tracking-tight mb-6 uppercase">
               Reach 17,000+ Northwest Arkansas Homeowners &amp; Contractors
             </h1>
-            <p className="text-white/70 text-lg leading-relaxed max-w-2xl mb-10">
+            <p className="text-white/70 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
               Exclusive advertising inside the region&apos;s largest contractor community.
               One business per category. Limited monthly placements.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 justify-center">
               <Link href="/availability" className="px-8 py-3.5 bg-red-700 text-white text-sm font-black uppercase tracking-widest hover:bg-red-800 transition-colors">
                 Check Availability
               </Link>
@@ -137,38 +137,42 @@ export default async function HomePage() {
           )}
 
           {/* Position inventory */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10 max-w-3xl mx-auto text-left">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10 max-w-3xl mx-auto">
             {coverSlots.map((sponsor, i) => (
               sponsor ? (
                 /* Claimed position */
-                <div key={i} className="bg-zinc-950 border border-zinc-800 p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-600">
-                      Position {String(i + 1).padStart(2, '0')}
+                <div key={i} className="bg-zinc-950 border border-zinc-800 flex flex-col items-center justify-center text-center py-8 px-4 gap-4">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">Cover</p>
+                    <p className="text-2xl font-black text-white uppercase tracking-tight leading-none">
+                      Position {i + 1}
                     </p>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-red-500 border border-red-900 px-2 py-1">
-                      Claimed
-                    </span>
                   </div>
-                  <p className="text-white font-bold text-base leading-tight">{sponsor.company_name}</p>
+                  <div className="w-8 h-px bg-zinc-700" />
+                  <div>
+                    <span className="block text-[9px] font-black uppercase tracking-widest text-red-500 mb-2">Claimed</span>
+                    <p className="text-sm text-zinc-300 font-semibold leading-snug">{sponsor.company_name}</p>
+                  </div>
                 </div>
               ) : (
                 /* Available position */
-                <div key={i} className="border-2 border-dashed border-zinc-300 bg-zinc-50 p-6 flex flex-col justify-between min-h-[104px]">
-                  <div className="flex items-start justify-between mb-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.25em] text-zinc-500">
-                      Position {String(i + 1).padStart(2, '0')}
+                <div key={i} className="border border-zinc-200 bg-white flex flex-col items-center justify-center text-center py-8 px-4 gap-4">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-1">Cover</p>
+                    <p className="text-2xl font-black text-zinc-950 uppercase tracking-tight leading-none">
+                      Position {i + 1}
                     </p>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 border border-emerald-300 px-2 py-1 bg-emerald-50">
-                      Open
-                    </span>
                   </div>
-                  <Link
-                    href="/reserve"
-                    className="inline-block text-[11px] font-black uppercase tracking-widest text-white bg-red-700 px-4 py-2.5 hover:bg-red-800 transition-colors self-start"
-                  >
-                    Reserve This Position →
-                  </Link>
+                  <div className="w-8 h-px bg-zinc-200" />
+                  <div>
+                    <span className="block text-[9px] font-black uppercase tracking-widest text-emerald-600 mb-3">Available</span>
+                    <Link
+                      href="/reserve"
+                      className="text-[11px] font-black uppercase tracking-widest text-white bg-red-700 px-4 py-2 hover:bg-red-800 transition-colors"
+                    >
+                      Reserve
+                    </Link>
+                  </div>
                 </div>
               )
             ))}
@@ -393,6 +397,35 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ── FINE PRINT ───────────────────────────────────────────── */}
+      <section className="bg-white border-t border-zinc-200 py-16 px-6 sm:px-10">
+        <div className="max-w-4xl mx-auto">
+          <h3 className="text-xs font-black uppercase tracking-[0.25em] text-zinc-400 mb-6">
+            Featured Placement Information
+          </h3>
+          <div className="space-y-4 text-zinc-400 text-sm leading-relaxed">
+            <p>
+              Featured placement is paid advertising space designed to help local businesses gain
+              additional visibility within the Contractors in Northwest Arkansas community.
+            </p>
+            <p>
+              Featured businesses receive enhanced exposure through monthly sponsorship placements,
+              company listings, and promotional opportunities. However, featured placement does not
+              guarantee jobs, referrals, recommendations, or customer selection.
+            </p>
+            <p>
+              Homeowners are encouraged to research contractors, compare options, and choose the
+              company that best fits their needs. Featured businesses are not the only companies
+              that may be recommended or discussed within the community.
+            </p>
+            <p>
+              Our goal is to support local businesses while maintaining a helpful, trustworthy, and
+              unbiased environment for homeowners and contractors throughout Northwest Arkansas.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* ── FINAL CTA ─────────────────────────────────────────────── */}
       <section className="bg-red-700 py-24 px-6 sm:px-10">
