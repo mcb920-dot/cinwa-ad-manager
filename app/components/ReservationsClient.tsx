@@ -44,7 +44,7 @@ function fmt(iso: string) {
 }
 
 export default function ReservationsClient({ reservations: initial, months, categories }: Props) {
-  const [rows, setRows]         = useState<Reservation[]>(initial)
+  const [rows, setRows]             = useState<Reservation[]>(initial)
   const [processing, setProcessing] = useState<number | null>(null)
   const [rowErrors, setRowErrors]   = useState<Record<number, string>>({})
 
@@ -52,15 +52,22 @@ export default function ReservationsClient({ reservations: initial, months, cate
   const catMap   = Object.fromEntries(categories.map((c) => [c.id, c.name]))
   const newCount = rows.filter((r) => r.status === 'New').length
 
+  function setError(id: number, msg: string) {
+    setRowErrors((prev) => ({ ...prev, [id]: msg }))
+  }
   function clearError(id: number) {
-    setRowErrors((prev) => { const next = { ...prev }; delete next[id]; return next })
+    setRowErrors((prev) => { const n = { ...prev }; delete n[id]; return n })
   }
 
   async function handleStatusChange(id: number, status: Status) {
     setProcessing(id)
     clearError(id)
     const { error } = await supabase.from('reservations').update({ status }).eq('id', id)
-    if (!error) setRows((prev) => prev.map((r) => r.id === id ? { ...r, status } : r))
+    if (error) {
+      setError(id, error.message || 'Update failed — check Supabase permissions.')
+    } else {
+      setRows((prev) => prev.map((r) => r.id === id ? { ...r, status } : r))
+    }
     setProcessing(null)
   }
 
@@ -72,7 +79,7 @@ export default function ReservationsClient({ reservations: initial, months, cate
     setProcessing(r.id)
     clearError(r.id)
 
-    // 1. Create the inventory record
+    // 1. Create the inventory record first
     let createErr: string | null = null
 
     if (r.package_type === 'featured_partner') {
@@ -90,8 +97,8 @@ export default function ReservationsClient({ reservations: initial, months, cate
       }])
       if (error) {
         createErr = error.code === '23505'
-          ? 'This category is already taken for this month. Remove the duplicate in Partner Spots first.'
-          : error.message
+          ? 'Category already taken for this month. Remove the duplicate in Partner Spots first.'
+          : (error.message || 'Failed to create partner spot — check Supabase permissions.')
       }
     } else if (r.package_type === 'cover_sponsor') {
       const { error } = await supabase.from('cover_sponsors').insert([{
@@ -101,19 +108,25 @@ export default function ReservationsClient({ reservations: initial, months, cate
         paid:         true,
         active:       true,
       }])
-      if (error) createErr = error.message
+      if (error) {
+        createErr = error.message || 'Failed to create cover sponsor — check Supabase permissions.'
+      }
     }
 
     if (createErr) {
-      setRowErrors((prev) => ({ ...prev, [r.id]: createErr! }))
+      setError(r.id, createErr)
       setProcessing(null)
       return
     }
 
     // 2. Mark reservation Paid only after record created successfully
-    const { error: statusErr } = await supabase.from('reservations').update({ status: 'Paid' }).eq('id', r.id)
+    const { error: statusErr } = await supabase
+      .from('reservations')
+      .update({ status: 'Paid' })
+      .eq('id', r.id)
+
     if (statusErr) {
-      setRowErrors((prev) => ({ ...prev, [r.id]: statusErr.message }))
+      setError(r.id, statusErr.message || 'Record created but status update failed.')
     } else {
       setRows((prev) => prev.map((row) => row.id === r.id ? { ...row, status: 'Paid' } : row))
     }
@@ -156,7 +169,7 @@ export default function ReservationsClient({ reservations: initial, months, cate
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
                   {rows.map((r) => {
-                    const busy = processing === r.id
+                    const busy        = processing === r.id
                     const canApprove  = r.status === 'New' || r.status === 'Contacted'
                     const canMarkPaid = r.status === 'Approved' || r.status === 'Payment Sent'
                     return (
@@ -178,12 +191,12 @@ export default function ReservationsClient({ reservations: initial, months, cate
 
                         {/* Action buttons */}
                         <td className="px-4 py-3 align-top">
-                          <div className="flex flex-col gap-1.5 min-w-[110px]">
+                          <div className="flex flex-col gap-1.5 min-w-[120px]">
                             {canApprove && (
                               <button
                                 disabled={busy}
                                 onClick={() => handleApprove(r.id)}
-                                className="px-3 py-1 bg-blue-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-blue-700 disabled:opacity-40 transition-colors whitespace-nowrap"
+                                className="px-3 py-1.5 bg-blue-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-blue-700 disabled:opacity-40 transition-colors whitespace-nowrap"
                               >
                                 {busy ? '…' : 'Approve'}
                               </button>
@@ -192,19 +205,19 @@ export default function ReservationsClient({ reservations: initial, months, cate
                               <button
                                 disabled={busy}
                                 onClick={() => handleMarkPaid(r)}
-                                className="px-3 py-1 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-emerald-700 disabled:opacity-40 transition-colors whitespace-nowrap"
+                                className="px-3 py-1.5 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-emerald-700 disabled:opacity-40 transition-colors whitespace-nowrap"
                               >
                                 {busy ? 'Creating…' : 'Mark Paid'}
                               </button>
                             )}
                             {r.status === 'Paid' && (
-                              <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wide">
+                              <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wide whitespace-nowrap">
                                 ✓ Record created
                               </span>
                             )}
                             {rowErrors[r.id] && (
-                              <p className="text-[11px] text-red-600 max-w-[160px] leading-tight">
-                                {rowErrors[r.id]}
+                              <p className="text-[11px] text-red-600 max-w-[180px] leading-snug mt-1">
+                                ⚠ {rowErrors[r.id]}
                               </p>
                             )}
                           </div>
