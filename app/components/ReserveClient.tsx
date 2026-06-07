@@ -81,6 +81,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
     setSubmitting(true)
     setSubmitError(null)
 
+    // 1. Save to Supabase — source of truth
     const { error: err } = await supabase.from('reservations').insert([{
       month_id: Number(form.monthId),
       package_type: form.packageType,
@@ -103,6 +104,31 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
       )
       return
     }
+
+    // 2. Notify via Formspree — best-effort, never blocks success
+    const monthName   = months.find((m) => String(m.id) === form.monthId)?.name ?? form.monthId
+    const categoryName = categories.find((c) => String(c.id) === form.categoryId)?.name ?? ''
+    const packageLabel = form.packageType === 'featured_partner'
+      ? 'Featured Partner — $120/month'
+      : 'Cover Sponsor'
+
+    fetch('https://formspree.io/f/xkoajloe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        company_name:  form.companyName,
+        contact_name:  form.contactName,
+        email:         form.email,
+        phone:         form.phone,
+        month:         monthName,
+        package_type:  packageLabel,
+        category:      form.packageType === 'featured_partner' ? categoryName : 'N/A',
+        website:       form.website || '',
+        facebook_url:  form.facebookUrl || '',
+        message:       form.message || '',
+      }),
+    }).catch(() => {}) // silently ignore — Supabase is the record of truth
+
     setSubmitted(true)
   }
 
