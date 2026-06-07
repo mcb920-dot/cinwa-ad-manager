@@ -2,7 +2,13 @@
 import { useState } from 'react'
 import Sidebar from './Sidebar'
 
-export default function AdminShell({ children }: { children: React.ReactNode }) {
+export default function AdminShell({
+  children,
+  newReservationCount = 0,
+}: {
+  children: React.ReactNode
+  newReservationCount?: number
+}) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -21,7 +27,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
-        <Sidebar onClose={() => setOpen(false)} />
+        <Sidebar onClose={() => setOpen(false)} newReservationCount={newReservationCount} />
       </div>
 
       {/* Main content */}
