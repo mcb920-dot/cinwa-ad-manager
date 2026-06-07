@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { supabase } from '@/src/lib/supabase'
 
-const STATUSES = ['New', 'Contacted', 'Approved', 'Declined'] as const
+const STATUSES = ['New', 'Contacted', 'Approved', 'Payment Sent', 'Paid', 'Declined'] as const
 type Status = typeof STATUSES[number]
 
 export type Reservation = {
@@ -22,18 +22,21 @@ export type Reservation = {
 }
 
 type LookupItem = { id: number; name: string }
-
-type Props = {
-  reservations: Reservation[]
-  months: LookupItem[]
-  categories: LookupItem[]
-}
+type Props = { reservations: Reservation[]; months: LookupItem[]; categories: LookupItem[] }
 
 const STATUS_STYLES: Record<Status, string> = {
-  New:       'bg-red-600 text-white',
-  Contacted: 'bg-amber-500 text-black',
-  Approved:  'bg-emerald-600 text-white',
-  Declined:  'bg-zinc-600 text-white',
+  New:             'bg-red-600 text-white',
+  Contacted:       'bg-amber-500 text-black',
+  Approved:        'bg-blue-600 text-white',
+  'Payment Sent':  'bg-indigo-600 text-white',
+  Paid:            'bg-emerald-600 text-white',
+  Declined:        'bg-zinc-500 text-white',
+}
+
+const ROW_TINT: Partial<Record<Status, string>> = {
+  New:      'bg-red-50/50',
+  Approved: 'bg-blue-50/30',
+  Paid:     'bg-emerald-50/30',
 }
 
 function fmt(iso: string) {
@@ -41,25 +44,86 @@ function fmt(iso: string) {
 }
 
 export default function ReservationsClient({ reservations: initial, months, categories }: Props) {
-  const [rows, setRows]       = useState<Reservation[]>(initial)
-  const [updating, setUpdating] = useState<number | null>(null)
+  const [rows, setRows]         = useState<Reservation[]>(initial)
+  const [processing, setProcessing] = useState<number | null>(null)
+  const [rowErrors, setRowErrors]   = useState<Record<number, string>>({})
 
   const monthMap = Object.fromEntries(months.map((m) => [m.id, m.name]))
   const catMap   = Object.fromEntries(categories.map((c) => [c.id, c.name]))
-
   const newCount = rows.filter((r) => r.status === 'New').length
 
-  async function handleStatusChange(id: number, status: Status) {
-    setUpdating(id)
-    const { error } = await supabase.from('reservations').update({ status }).eq('id', id)
-    if (!error) {
-      setRows((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)))
-    }
-    setUpdating(null)
+  function clearError(id: number) {
+    setRowErrors((prev) => { const next = { ...prev }; delete next[id]; return next })
   }
 
-  const packageLabel = (raw: string) =>
+  async function handleStatusChange(id: number, status: Status) {
+    setProcessing(id)
+    clearError(id)
+    const { error } = await supabase.from('reservations').update({ status }).eq('id', id)
+    if (!error) setRows((prev) => prev.map((r) => r.id === id ? { ...r, status } : r))
+    setProcessing(null)
+  }
+
+  async function handleApprove(id: number) {
+    await handleStatusChange(id, 'Approved')
+  }
+
+  async function handleMarkPaid(r: Reservation) {
+    setProcessing(r.id)
+    clearError(r.id)
+
+    // 1. Create the inventory record
+    let createErr: string | null = null
+
+    if (r.package_type === 'featured_partner') {
+      const { error } = await supabase.from('partner_spots').insert([{
+        month_id:     r.month_id,
+        category_id:  r.category_id,
+        company_name: r.company_name,
+        contact_name: r.contact_name ?? '',
+        email:        r.email,
+        phone:        r.phone ?? '',
+        website:      r.website ?? '',
+        facebook_url: r.facebook_url ?? '',
+        paid:         true,
+        active:       true,
+      }])
+      if (error) {
+        createErr = error.code === '23505'
+          ? 'This category is already taken for this month. Remove the duplicate in Partner Spots first.'
+          : error.message
+      }
+    } else if (r.package_type === 'cover_sponsor') {
+      const { error } = await supabase.from('cover_sponsors').insert([{
+        month_id:     r.month_id,
+        company_name: r.company_name,
+        position:     '',
+        paid:         true,
+        active:       true,
+      }])
+      if (error) createErr = error.message
+    }
+
+    if (createErr) {
+      setRowErrors((prev) => ({ ...prev, [r.id]: createErr! }))
+      setProcessing(null)
+      return
+    }
+
+    // 2. Mark reservation Paid only after record created successfully
+    const { error: statusErr } = await supabase.from('reservations').update({ status: 'Paid' }).eq('id', r.id)
+    if (statusErr) {
+      setRowErrors((prev) => ({ ...prev, [r.id]: statusErr.message }))
+    } else {
+      setRows((prev) => prev.map((row) => row.id === r.id ? { ...row, status: 'Paid' } : row))
+    }
+    setProcessing(null)
+  }
+
+  const pkgLabel = (raw: string) =>
     raw === 'featured_partner' ? 'Featured Partner' : raw === 'cover_sponsor' ? 'Cover Sponsor' : raw
+
+  const COLS = ['Status', 'Actions', 'Company', 'Contact', 'Email', 'Phone', 'Month', 'Package', 'Category', 'Message', 'Submitted']
 
   return (
     <>
@@ -83,7 +147,7 @@ export default function ReservationsClient({ reservations: initial, months, cate
               <table className="w-full text-sm">
                 <thead className="border-b border-zinc-200">
                   <tr className="bg-zinc-50">
-                    {['Status', 'Company', 'Contact', 'Email', 'Phone', 'Month', 'Package', 'Category', 'Website', 'Facebook', 'Message', 'Submitted'].map((h) => (
+                    {COLS.map((h) => (
                       <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold text-zinc-400 uppercase tracking-widest whitespace-nowrap">
                         {h}
                       </th>
@@ -91,41 +155,85 @@ export default function ReservationsClient({ reservations: initial, months, cate
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
-                  {rows.map((r) => (
-                    <tr key={r.id} className={`hover:bg-zinc-50/70 transition-colors ${r.status === 'New' ? 'bg-red-50/40' : ''}`}>
-                      <td className="px-4 py-2">
-                        <select
-                          value={r.status}
-                          disabled={updating === r.id}
-                          onChange={(e) => handleStatusChange(r.id, e.target.value as Status)}
-                          className={`text-[11px] font-bold rounded px-2 py-1 border-0 cursor-pointer disabled:opacity-50 ${STATUS_STYLES[r.status]}`}
-                        >
-                          {STATUSES.map((s) => (
-                            <option key={s} value={s} className="bg-white text-zinc-900">{s}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="px-4 py-2 font-semibold text-zinc-800 whitespace-nowrap">{r.company_name}</td>
-                      <td className="px-4 py-2 text-zinc-500 whitespace-nowrap">{r.contact_name ?? '—'}</td>
-                      <td className="px-4 py-2 text-zinc-500 whitespace-nowrap">
-                        <a href={`mailto:${r.email}`} className="hover:text-zinc-900 underline underline-offset-2">{r.email}</a>
-                      </td>
-                      <td className="px-4 py-2 text-zinc-500 whitespace-nowrap">{r.phone ?? '—'}</td>
-                      <td className="px-4 py-2 text-zinc-500 whitespace-nowrap">{r.month_id ? (monthMap[r.month_id] ?? r.month_id) : '—'}</td>
-                      <td className="px-4 py-2 text-zinc-500 whitespace-nowrap">{packageLabel(r.package_type)}</td>
-                      <td className="px-4 py-2 text-zinc-500 whitespace-nowrap">{r.category_id ? (catMap[r.category_id] ?? '—') : '—'}</td>
-                      <td className="px-4 py-2 text-zinc-500 whitespace-nowrap max-w-[140px] truncate">
-                        {r.website ? <a href={r.website} target="_blank" rel="noreferrer" className="hover:text-zinc-900 underline underline-offset-2">{r.website}</a> : '—'}
-                      </td>
-                      <td className="px-4 py-2 text-zinc-500 whitespace-nowrap max-w-[140px] truncate">
-                        {r.facebook_url ? <a href={r.facebook_url} target="_blank" rel="noreferrer" className="hover:text-zinc-900 underline underline-offset-2">{r.facebook_url}</a> : '—'}
-                      </td>
-                      <td className="px-4 py-2 text-zinc-500 max-w-[200px]">
-                        <span className="line-clamp-2 text-xs">{r.message ?? '—'}</span>
-                      </td>
-                      <td className="px-4 py-2 text-zinc-400 whitespace-nowrap text-xs">{fmt(r.created_at)}</td>
-                    </tr>
-                  ))}
+                  {rows.map((r) => {
+                    const busy = processing === r.id
+                    const canApprove  = r.status === 'New' || r.status === 'Contacted'
+                    const canMarkPaid = r.status === 'Approved' || r.status === 'Payment Sent'
+                    return (
+                      <tr key={r.id} className={`transition-colors ${ROW_TINT[r.status] ?? ''}`}>
+
+                        {/* Status dropdown */}
+                        <td className="px-4 py-3 align-top">
+                          <select
+                            value={r.status}
+                            disabled={busy}
+                            onChange={(e) => handleStatusChange(r.id, e.target.value as Status)}
+                            className={`text-[11px] font-bold rounded px-2 py-1 border-0 cursor-pointer disabled:opacity-50 ${STATUS_STYLES[r.status]}`}
+                          >
+                            {STATUSES.map((s) => (
+                              <option key={s} value={s} className="bg-white text-zinc-900">{s}</option>
+                            ))}
+                          </select>
+                        </td>
+
+                        {/* Action buttons */}
+                        <td className="px-4 py-3 align-top">
+                          <div className="flex flex-col gap-1.5 min-w-[110px]">
+                            {canApprove && (
+                              <button
+                                disabled={busy}
+                                onClick={() => handleApprove(r.id)}
+                                className="px-3 py-1 bg-blue-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-blue-700 disabled:opacity-40 transition-colors whitespace-nowrap"
+                              >
+                                {busy ? '…' : 'Approve'}
+                              </button>
+                            )}
+                            {canMarkPaid && (
+                              <button
+                                disabled={busy}
+                                onClick={() => handleMarkPaid(r)}
+                                className="px-3 py-1 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-emerald-700 disabled:opacity-40 transition-colors whitespace-nowrap"
+                              >
+                                {busy ? 'Creating…' : 'Mark Paid'}
+                              </button>
+                            )}
+                            {r.status === 'Paid' && (
+                              <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wide">
+                                ✓ Record created
+                              </span>
+                            )}
+                            {rowErrors[r.id] && (
+                              <p className="text-[11px] text-red-600 max-w-[160px] leading-tight">
+                                {rowErrors[r.id]}
+                              </p>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="px-4 py-3 font-semibold text-zinc-800 whitespace-nowrap align-top">{r.company_name}</td>
+                        <td className="px-4 py-3 text-zinc-500 whitespace-nowrap align-top">{r.contact_name ?? '—'}</td>
+                        <td className="px-4 py-3 text-zinc-500 whitespace-nowrap align-top">
+                          <a href={`mailto:${r.email}`} className="hover:text-zinc-900 underline underline-offset-2">{r.email}</a>
+                        </td>
+                        <td className="px-4 py-3 text-zinc-500 whitespace-nowrap align-top">{r.phone ?? '—'}</td>
+                        <td className="px-4 py-3 text-zinc-500 whitespace-nowrap align-top">
+                          {r.month_id ? (monthMap[r.month_id] ?? `#${r.month_id}`) : '—'}
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap align-top">
+                          <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${r.package_type === 'featured_partner' ? 'bg-zinc-100 text-zinc-700' : 'bg-zinc-800 text-zinc-200'}`}>
+                            {pkgLabel(r.package_type)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-zinc-500 whitespace-nowrap align-top">
+                          {r.category_id ? (catMap[r.category_id] ?? `#${r.category_id}`) : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-zinc-500 align-top max-w-[200px]">
+                          <span className="line-clamp-3 text-xs leading-relaxed">{r.message ?? '—'}</span>
+                        </td>
+                        <td className="px-4 py-3 text-zinc-400 whitespace-nowrap align-top text-xs">{fmt(r.created_at)}</td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
