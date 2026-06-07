@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/src/lib/supabase'
 
 const PARTNER_LIMIT = 20
-const COVER_LIMIT = 4
+const COVER_LIMIT   = 4
 
-type Month = { id: number; name: string }
+type Month    = { id: number; name: string }
 type Category = { id: number; name: string }
 type PackageType = 'featured_partner' | 'cover_sponsor'
 
@@ -16,29 +16,22 @@ type Props = {
 }
 
 const EMPTY = {
-  monthId: '',
-  packageType: '' as PackageType | '',
-  categoryId: '',
-  companyName: '',
-  contactName: '',
-  email: '',
-  phone: '',
-  website: '',
-  facebookUrl: '',
-  message: '',
+  monthId: '', packageType: '' as PackageType | '',
+  categoryId: '', companyName: '', contactName: '',
+  email: '', phone: '', website: '', facebookUrl: '', message: '',
 }
 
-const INPUT =
-  'w-full bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 rounded px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors'
+const INPUT = 'w-full bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-600 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-700 focus:border-transparent transition-colors'
+const SELECT = `${INPUT} cursor-pointer`
 
 export default function ReserveClient({ months, categories, initialMonthId }: Props) {
-  const [form, setForm] = useState({ ...EMPTY, monthId: initialMonthId ? String(initialMonthId) : '' })
+  const [form, setForm]               = useState({ ...EMPTY, monthId: initialMonthId ? String(initialMonthId) : '' })
   const [availableCategories, setAvailableCategories] = useState<Category[]>([])
   const [capacityError, setCapacityError] = useState<string | null>(null)
   const [checkingAvailability, setCheckingAvailability] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
+  const [submitting, setSubmitting]   = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const [submitted, setSubmitted] = useState(false)
+  const [submitted, setSubmitted]     = useState(false)
 
   function set(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }))
@@ -68,7 +61,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
     } else {
       supabase.from('cover_sponsors').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('active', true).then(({ count }) => {
         if ((count ?? 0) >= COVER_LIMIT) {
-          setCapacityError('Cover sponsor spots are full for this month. Please choose another month.')
+          setCapacityError('Cover sponsor positions are full for this month.')
         }
         setCheckingAvailability(false)
       })
@@ -83,16 +76,17 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
 
     // 1. Save to Supabase — source of truth
     const { error: err } = await supabase.from('reservations').insert([{
-      month_id: Number(form.monthId),
+      month_id:     Number(form.monthId),
       package_type: form.packageType,
-      category_id: form.packageType === 'featured_partner' && form.categoryId ? Number(form.categoryId) : null,
+      category_id:  form.packageType === 'featured_partner' && form.categoryId ? Number(form.categoryId) : null,
       company_name: form.companyName,
       contact_name: form.contactName,
-      email: form.email,
-      phone: form.phone,
-      website: form.website || null,
+      email:        form.email,
+      phone:        form.phone,
+      website:      form.website || null,
       facebook_url: form.facebookUrl || null,
-      message: form.message || null,
+      message:      form.message || null,
+      status:       'New',
     }])
 
     setSubmitting(false)
@@ -106,7 +100,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
     }
 
     // 2. Notify via Formspree — best-effort, never blocks success
-    const monthName   = months.find((m) => String(m.id) === form.monthId)?.name ?? form.monthId
+    const monthName    = months.find((m) => String(m.id) === form.monthId)?.name ?? form.monthId
     const categoryName = categories.find((c) => String(c.id) === form.categoryId)?.name ?? ''
     const packageLabel = form.packageType === 'featured_partner'
       ? 'Featured Partner — $120/month'
@@ -116,18 +110,18 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
-        company_name:  form.companyName,
-        contact_name:  form.contactName,
-        email:         form.email,
-        phone:         form.phone,
-        month:         monthName,
-        package_type:  packageLabel,
-        category:      form.packageType === 'featured_partner' ? categoryName : 'N/A',
-        website:       form.website || '',
-        facebook_url:  form.facebookUrl || '',
-        message:       form.message || '',
+        company_name: form.companyName,
+        contact_name: form.contactName,
+        email:        form.email,
+        phone:        form.phone,
+        month:        monthName,
+        package_type: packageLabel,
+        category:     form.packageType === 'featured_partner' ? categoryName : 'N/A',
+        website:      form.website || '',
+        facebook_url: form.facebookUrl || '',
+        message:      form.message || '',
       }),
-    }).catch(() => {}) // silently ignore — Supabase is the record of truth
+    }).catch(() => {})
 
     setSubmitted(true)
   }
@@ -136,15 +130,22 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
     return (
       <div className="bg-zinc-950 min-h-full flex items-center justify-center px-6 py-32">
         <div className="text-center max-w-lg">
-          <div className="w-14 h-14 rounded-full bg-emerald-950 border border-emerald-800 flex items-center justify-center mx-auto mb-8 text-emerald-400 text-xl font-bold">
-            ✓
+          <div className="w-14 h-14 bg-red-700 flex items-center justify-center mx-auto mb-8">
+            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-4">Request Submitted</h1>
-          <p className="text-zinc-400 leading-relaxed mb-10">
-            Thanks — your request has been submitted. I&apos;ll follow up to confirm availability
-            and next steps.
+          <p className="text-red-600 text-xs font-black uppercase tracking-[0.3em] mb-4">Request Received</p>
+          <h1 className="text-4xl font-black text-white uppercase tracking-tight mb-4">
+            You&apos;re on the list.
+          </h1>
+          <p className="text-zinc-400 text-base leading-relaxed mb-10">
+            Your request has been submitted. We&apos;ll follow up to confirm availability and next steps within 1–2 business days.
           </p>
-          <a href="/" className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+          <a
+            href="/"
+            className="inline-block px-8 py-3.5 border border-zinc-700 text-zinc-300 text-xs font-black uppercase tracking-widest hover:border-white hover:text-white transition-colors"
+          >
             ← Back to Home
           </a>
         </div>
@@ -152,29 +153,23 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
     )
   }
 
-  const selectedMonth = months.find((m) => String(m.id) === form.monthId)
+  const selectedMonth   = months.find((m) => String(m.id) === form.monthId)
   const isFeaturedPartner = form.packageType === 'featured_partner'
-  const canSubmit = !capacityError && !checkingAvailability && form.packageType !== ''
+  const canSubmit       = !capacityError && !checkingAvailability && form.packageType !== ''
 
   return (
     <div className="bg-zinc-950 min-h-full">
       {/* Page header */}
-      <div
-        className="border-b border-zinc-800"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-        }}
-      >
-        <div className="max-w-5xl mx-auto px-6 pt-16 pb-14">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-500 mb-5">
+      <div className="bg-zinc-950 border-b border-zinc-800">
+        <div className="max-w-5xl mx-auto px-6 pt-16 pb-14 text-center">
+          <p className="text-red-600 text-xs font-black uppercase tracking-[0.3em] mb-5">
             Reserve a Spot
           </p>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white leading-tight tracking-tight mb-4">
+          <h1 className="text-4xl sm:text-5xl font-black text-white uppercase tracking-tight leading-tight mb-4">
             Apply for Placement
           </h1>
-          <p className="text-zinc-400 text-lg max-w-xl">
-            Fill out the form below and we&apos;ll confirm your spot within 1–2 business days.
+          <p className="text-zinc-400 text-base max-w-lg mx-auto">
+            Fill out the form below. We&apos;ll confirm your spot within 1–2 business days.
           </p>
         </div>
       </div>
@@ -193,12 +188,10 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
                 value={form.monthId}
                 onChange={(e) => { set('monthId', e.target.value); set('categoryId', '') }}
                 required
-                className={INPUT}
+                className={SELECT}
               >
                 <option value="">Select a month</option>
-                {months.map((m) => (
-                  <option key={m.id} value={m.id}>{m.name}</option>
-                ))}
+                {months.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
               </select>
             </div>
 
@@ -208,7 +201,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
                 value={form.packageType}
                 onChange={(e) => { set('packageType', e.target.value); set('categoryId', '') }}
                 required
-                className={INPUT}
+                className={SELECT}
               >
                 <option value="">Select a package</option>
                 <option value="featured_partner">Featured Partner — $120/month</option>
@@ -221,7 +214,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
               checkingAvailability ? (
                 <p className="text-zinc-500 text-sm">Checking availability…</p>
               ) : capacityError ? (
-                <div className="border border-red-800 bg-red-950/50 rounded px-4 py-3 text-sm text-red-400">
+                <div className="border border-red-800 bg-red-950/50 px-4 py-3 text-sm text-red-400">
                   {capacityError}
                 </div>
               ) : null
@@ -232,24 +225,20 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
               <div>
                 <Label text="Category" required />
                 {availableCategories.length === 0 ? (
-                  <p className="text-zinc-500 text-sm mt-1">
-                    No categories available for {selectedMonth?.name ?? 'this month'}.
-                  </p>
+                  <p className="text-zinc-500 text-sm mt-1">No categories available for {selectedMonth?.name ?? 'this month'}.</p>
                 ) : (
                   <>
                     <select
                       value={form.categoryId}
                       onChange={(e) => set('categoryId', e.target.value)}
                       required
-                      className={INPUT}
+                      className={SELECT}
                     >
                       <option value="">Select your category</option>
-                      {availableCategories.map((c) => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
+                      {availableCategories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                     <p className="text-zinc-600 text-xs mt-2">
-                      Showing available categories for {selectedMonth?.name ?? 'the selected month'} only.
+                      Showing open categories for {selectedMonth?.name ?? 'the selected month'} only.
                     </p>
                   </>
                 )}
@@ -308,7 +297,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
           </div>
 
           {submitError && (
-            <div className="border border-red-800 bg-red-950/50 rounded px-4 py-3 text-sm text-red-400">
+            <div className="border border-red-800 bg-red-950/50 px-4 py-3 text-sm text-red-400">
               {submitError}
             </div>
           )}
@@ -316,13 +305,13 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
           <button
             type="submit"
             disabled={submitting || !canSubmit}
-            className="w-full py-3.5 bg-blue-700 text-white font-semibold rounded hover:bg-blue-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-4 bg-red-700 text-white font-black text-sm uppercase tracking-widest hover:bg-red-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             {submitting ? 'Submitting…' : 'Submit Request'}
           </button>
 
           <p className="text-xs text-zinc-600 text-center">
-            Submitting this form does not guarantee a spot. We will confirm availability and follow up within 1–2 business days.
+            Submitting does not guarantee a spot. We will confirm availability and follow up within 1–2 business days.
           </p>
         </form>
       </div>
@@ -331,9 +320,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
 }
 
 function SectionLabel({ text }: { text: string }) {
-  return (
-    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">{text}</p>
-  )
+  return <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{text}</p>
 }
 
 function Divider() {
@@ -342,8 +329,8 @@ function Divider() {
 
 function Label({ text, required }: { text: string; required?: boolean }) {
   return (
-    <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-      {text}{required && <span className="text-blue-500 ml-0.5">*</span>}
+    <label className="block text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2">
+      {text}{required && <span className="text-red-600 ml-0.5">*</span>}
     </label>
   )
 }
