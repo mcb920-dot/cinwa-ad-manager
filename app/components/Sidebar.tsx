@@ -4,14 +4,21 @@ import { usePathname } from 'next/navigation'
 import { logout } from '@/app/actions/admin-auth'
 
 const NAV = [
-  { label: 'Dashboard', href: '/admin' },
+  { label: 'Dashboard',     href: '/admin' },
+  { label: 'Reservations',  href: '/admin/reservations' },
   { label: 'Partner Spots', href: '/admin/partner-spots' },
-  { label: 'Cover Sponsors', href: '/admin/cover-sponsors' },
-  { label: 'Categories', href: '/admin/categories' },
-  { label: 'Months', href: '/admin/months' },
+  { label: 'Cover Sponsors',href: '/admin/cover-sponsors' },
+  { label: 'Categories',    href: '/admin/categories' },
+  { label: 'Months',        href: '/admin/months' },
 ]
 
-export default function Sidebar({ onClose }: { onClose?: () => void }) {
+export default function Sidebar({
+  onClose,
+  newReservationCount = 0,
+}: {
+  onClose?: () => void
+  newReservationCount?: number
+}) {
   const pathname = usePathname()
   return (
     <aside className="w-56 h-full bg-zinc-950 flex flex-col border-r border-white/[0.06]">
@@ -29,6 +36,8 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
       <nav className="flex flex-col gap-0.5 p-2.5 mt-1 flex-1">
         {NAV.map(({ label, href }) => {
           const active = pathname === href || (href !== '/admin' && pathname.startsWith(href))
+          const isReservations = href === '/admin/reservations'
+          const showBadge = isReservations && newReservationCount > 0 && !active
           return (
             <Link
               key={href}
@@ -41,7 +50,12 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
               }`}
             >
               {active && <span className="w-1 h-1 rounded-full bg-white/70 shrink-0" />}
-              {label}
+              <span className="flex-1">{label}</span>
+              {showBadge && (
+                <span className="ml-auto text-[10px] font-black bg-red-600 text-white rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                  {newReservationCount > 99 ? '99+' : newReservationCount}
+                </span>
+              )}
             </Link>
           )
         })}
