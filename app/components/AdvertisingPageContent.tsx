@@ -71,14 +71,14 @@ export default async function AdvertisingPageContent() {
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0 flex items-center">
           <div className="w-full max-w-5xl mx-auto px-6 sm:px-10 text-center">
-            <p className="text-red-400 text-xs font-black uppercase tracking-[0.3em] mb-6">
+            <h2 className="text-red-400 text-xl sm:text-2xl font-black uppercase tracking-[0.2em] mb-6">
               Contractors in Northwest Arkansas
-            </p>
+            </h2>
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.0] tracking-tight mb-6 uppercase">
               Reach 17,000+ Northwest Arkansas Homeowners &amp; Contractors
             </h1>
             <p className="text-white/70 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
-              Exclusive advertising inside the region&apos;s largest contractor community.
+              Advertising opportunities inside one of Northwest Arkansas&apos; largest contractor communities.
               One business per category. Limited monthly placements.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
