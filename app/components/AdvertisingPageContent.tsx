@@ -430,8 +430,8 @@ export default async function AdvertisingPageContent() {
               How Placements Work.
             </p>
             <p className="text-zinc-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-              We operate a straightforward advertising model inside Northwest Arkansas&apos; largest
-              contractor community. Here is what your placement includes — and what it does not.
+              We operate a straightforward advertising model inside one of Northwest Arkansas&apos; largest
+              contractor communities. Here is what your placement includes — and what it does not.
             </p>
           </div>
 
