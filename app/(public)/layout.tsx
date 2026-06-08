@@ -3,8 +3,29 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'CINWA — Contractors in Northwest Arkansas',
-  description: 'Advertise to 17,000+ Northwest Arkansas homeowners and contractors. Limited monthly placements.',
+  title: 'Contractors in Northwest Arkansas',
+  description: "Premium advertising opportunities inside Northwest Arkansas' largest contractor community.",
+  openGraph: {
+    type: 'website',
+    url: 'https://contractorsinnwa.com',
+    siteName: 'CINWA',
+    title: 'Contractors in Northwest Arkansas',
+    description: 'Get your business seen by homeowners and contractors across Northwest Arkansas.',
+    images: [
+      {
+        url: '/logo/Hero-photo.png',
+        width: 1731,
+        height: 909,
+        alt: 'CINWA — Contractors in Northwest Arkansas',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contractors in Northwest Arkansas',
+    description: 'Get your business seen by homeowners and contractors across Northwest Arkansas.',
+    images: ['/logo/Hero-photo.png'],
+  },
 }
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
