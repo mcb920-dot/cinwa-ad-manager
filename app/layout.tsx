@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Cinwa Ad Manager",
   description: "Ad Manager Dashboard",
+  metadataBase: new URL('https://contractorsinnwa.com'),
 };
 
 export default function RootLayout({
