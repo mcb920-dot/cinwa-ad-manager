@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Cinwa Ad Manager",
   description: "Ad Manager Dashboard",
+  icons: {
+    icon: "/logo/CINWA-favicon.png",
+    shortcut: "/logo/CINWA-favicon.png",
+    apple: "/logo/CINWA-favicon.png",
+  },
 };
 
 export default function RootLayout({
