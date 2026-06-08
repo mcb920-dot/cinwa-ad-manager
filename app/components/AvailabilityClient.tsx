@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/src/lib/supabase'
 
@@ -28,6 +28,10 @@ export default function AvailabilityClient({ months, categories, initialMonthId,
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
 
+  useEffect(() => {
+    console.log('[cinwa] availability initialData (from server):', initialData)
+  }, [])
+
   const selectedMonth = months.find((m) => m.id === selectedMonthId)
   const takenSet = new Set(data.takenCategoryIds)
   const query = search.toLowerCase()
@@ -45,14 +49,28 @@ export default function AvailabilityClient({ months, categories, initialMonthId,
       supabase.from('cover_sponsors').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('active', true),
       supabase.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('package_type', 'cover_sponsor').eq('status', 'Paid'),
       supabase.from('partner_spots').select('category_id').eq('month_id', monthId).eq('active', true),
-      supabase.from('reservations').select('category_id').eq('month_id', monthId).eq('package_type', 'featured_partner').eq('status', 'Paid'),
+      supabase.from('reservations').select('category_id, package_type, status').eq('month_id', monthId).eq('status', 'Paid'),
     ])
+    console.log('[cinwa] availability debug', {
+      monthId,
+      partnerSpotsCount: partnerCount.count,
+      paidPartnerResCount: paidPartnerCount.count,
+      paidPartnerResError: paidPartnerCount.error,
+      coverSpotsCount: coverCount.count,
+      paidCoverResCount: paidCoverCount.count,
+      allPaidRows: paidTakenSpots.data,
+      allPaidRowsError: paidTakenSpots.error,
+      takenFromSpots: takenSpots.data,
+    })
+    const paidPartnerRows = (paidTakenSpots.data ?? []).filter(
+      (r: { package_type: string; status: string; category_id: number | null }) => r.package_type === 'featured_partner'
+    )
     setData({
       partnerUsed: (partnerCount.count ?? 0) + (paidPartnerCount.count ?? 0),
       coverUsed: (coverCount.count ?? 0) + (paidCoverCount.count ?? 0),
       takenCategoryIds: [
         ...(takenSpots.data?.map((s: { category_id: number }) => s.category_id) ?? []),
-        ...(paidTakenSpots.data?.map((r: { category_id: number }) => r.category_id) ?? []),
+        ...paidPartnerRows.map((r: { category_id: number | null }) => r.category_id).filter((id: number | null): id is number => id !== null),
       ],
     })
     setLoading(false)
