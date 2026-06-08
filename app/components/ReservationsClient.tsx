@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { supabase } from '@/src/lib/supabase'
 
-const STATUSES = ['New', 'Contacted', 'Approved', 'Payment Sent', 'Paid', 'Declined'] as const
+const STATUSES = ['New', 'Contacted', 'Approved', 'Paid', 'Fulfilled', 'Declined'] as const
 type Status = typeof STATUSES[number]
 
 export type Reservation = {
@@ -25,22 +25,30 @@ type LookupItem = { id: number; name: string }
 type Props = { reservations: Reservation[]; months: LookupItem[]; categories: LookupItem[] }
 
 const STATUS_STYLES: Record<Status, string> = {
-  New:             'bg-red-600 text-white',
-  Contacted:       'bg-amber-500 text-black',
-  Approved:        'bg-blue-600 text-white',
-  'Payment Sent':  'bg-indigo-600 text-white',
-  Paid:            'bg-emerald-600 text-white',
-  Declined:        'bg-zinc-500 text-white',
+  New:        'bg-red-600 text-white',
+  Contacted:  'bg-amber-500 text-black',
+  Approved:   'bg-blue-600 text-white',
+  Paid:       'bg-emerald-600 text-white',
+  Fulfilled:  'bg-teal-700 text-white',
+  Declined:   'bg-zinc-500 text-white',
 }
 
 const ROW_TINT: Partial<Record<Status, string>> = {
-  New:      'bg-red-50/50',
-  Approved: 'bg-blue-50/30',
-  Paid:     'bg-emerald-50/30',
+  New:       'bg-red-50/50',
+  Approved:  'bg-blue-50/30',
+  Paid:      'bg-emerald-50/30',
+  Fulfilled: 'bg-teal-50/20',
 }
 
 function fmt(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+// Coerce a value that should be a bigint id — empty string becomes null
+function toId(v: number | null | undefined): number | null {
+  if (v === null || v === undefined) return null
+  if (typeof v === 'string' && (v as string) === '') return null
+  return Number(v)
 }
 
 export default function ReservationsClient({ reservations: initial, months, categories }: Props) {
@@ -62,73 +70,31 @@ export default function ReservationsClient({ reservations: initial, months, cate
   async function handleStatusChange(id: number, status: Status) {
     setProcessing(id)
     clearError(id)
-    const { error } = await supabase.from('reservations').update({ status }).eq('id', id)
-    if (error) {
-      setError(id, error.message || 'Update failed — check Supabase permissions.')
-    } else {
-      setRows((prev) => prev.map((r) => r.id === id ? { ...r, status } : r))
-    }
-    setProcessing(null)
-  }
 
-  async function handleApprove(id: number) {
-    await handleStatusChange(id, 'Approved')
-  }
+    const safeId = toId(id)
+    const payload = { status }
+    console.log('[cinwa] reservations UPDATE', { id: safeId, idType: typeof safeId, payload })
 
-  async function handleMarkPaid(r: Reservation) {
-    setProcessing(r.id)
-    clearError(r.id)
-
-    // 1. Create the inventory record first
-    let createErr: string | null = null
-
-    if (r.package_type === 'featured_partner') {
-      const { error } = await supabase.from('partner_spots').insert([{
-        month_id:     r.month_id,
-        category_id:  r.category_id,
-        company_name: r.company_name,
-        contact_name: r.contact_name ?? '',
-        email:        r.email,
-        phone:        r.phone ?? '',
-        website:      r.website ?? '',
-        facebook_url: r.facebook_url ?? '',
-        paid:         true,
-        active:       true,
-      }])
-      if (error) {
-        createErr = error.code === '23505'
-          ? 'Category already taken for this month. Remove the duplicate in Partner Spots first.'
-          : (error.message || 'Failed to create partner spot — check Supabase permissions.')
-      }
-    } else if (r.package_type === 'cover_sponsor') {
-      const { error } = await supabase.from('cover_sponsors').insert([{
-        month_id:     r.month_id,
-        company_name: r.company_name,
-        position:     '',
-        paid:         true,
-        active:       true,
-      }])
-      if (error) {
-        createErr = error.message || 'Failed to create cover sponsor — check Supabase permissions.'
-      }
-    }
-
-    if (createErr) {
-      setError(r.id, createErr)
-      setProcessing(null)
+    if (safeId === null) {
+      setError(id, 'Row ID is missing — cannot update.')
+      setProcessing(id)
       return
     }
 
-    // 2. Mark reservation Paid only after record created successfully
-    const { error: statusErr } = await supabase
+    const { data, error } = await supabase
       .from('reservations')
-      .update({ status: 'Paid' })
-      .eq('id', r.id)
+      .update(payload)
+      .eq('id', safeId)
+      .select()
 
-    if (statusErr) {
-      setError(r.id, statusErr.message || 'Record created but status update failed.')
+    console.log('[cinwa] reservations UPDATE result', { data, error })
+
+    if (error) {
+      setError(id, `Error: ${error.message}`)
+    } else if (!data || data.length === 0) {
+      setError(id, 'No rows updated — check Supabase RLS policies (anon UPDATE on reservations).')
     } else {
-      setRows((prev) => prev.map((row) => row.id === r.id ? { ...row, status: 'Paid' } : row))
+      setRows((prev) => prev.map((r) => r.id === id ? { ...r, status } : r))
     }
     setProcessing(null)
   }
@@ -171,7 +137,9 @@ export default function ReservationsClient({ reservations: initial, months, cate
                   {rows.map((r) => {
                     const busy        = processing === r.id
                     const canApprove  = r.status === 'New' || r.status === 'Contacted'
-                    const canMarkPaid = r.status === 'Approved' || r.status === 'Payment Sent'
+                    const canMarkPaid = r.status === 'Approved'
+                    const canFulfill  = r.status === 'Paid'
+                    const canDecline  = r.status === 'New' || r.status === 'Contacted' || r.status === 'Approved'
                     return (
                       <tr key={r.id} className={`transition-colors ${ROW_TINT[r.status] ?? ''}`}>
 
@@ -191,12 +159,12 @@ export default function ReservationsClient({ reservations: initial, months, cate
 
                         {/* Action buttons */}
                         <td className="px-4 py-3 align-top">
-                          <div className="flex flex-col gap-1.5 min-w-[120px]">
+                          <div className="flex flex-col gap-1.5 min-w-[130px]">
                             {canApprove && (
                               <button
                                 disabled={busy}
-                                onClick={() => handleApprove(r.id)}
-                                className="px-3 py-1.5 bg-blue-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-blue-700 disabled:opacity-40 transition-colors whitespace-nowrap"
+                                onClick={() => handleStatusChange(r.id, 'Approved')}
+                                className="px-3 py-1.5 bg-blue-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-blue-700 disabled:opacity-40 transition-colors"
                               >
                                 {busy ? '…' : 'Approve'}
                               </button>
@@ -204,19 +172,32 @@ export default function ReservationsClient({ reservations: initial, months, cate
                             {canMarkPaid && (
                               <button
                                 disabled={busy}
-                                onClick={() => handleMarkPaid(r)}
-                                className="px-3 py-1.5 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-emerald-700 disabled:opacity-40 transition-colors whitespace-nowrap"
+                                onClick={() => handleStatusChange(r.id, 'Paid')}
+                                className="px-3 py-1.5 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-emerald-700 disabled:opacity-40 transition-colors"
                               >
-                                {busy ? 'Creating…' : 'Mark Paid'}
+                                {busy ? '…' : 'Mark Paid'}
                               </button>
                             )}
-                            {r.status === 'Paid' && (
-                              <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wide whitespace-nowrap">
-                                ✓ Record created
-                              </span>
+                            {canFulfill && (
+                              <button
+                                disabled={busy}
+                                onClick={() => handleStatusChange(r.id, 'Fulfilled')}
+                                className="px-3 py-1.5 bg-teal-700 text-white text-[11px] font-black uppercase tracking-wide rounded hover:bg-teal-800 disabled:opacity-40 transition-colors"
+                              >
+                                {busy ? '…' : 'Mark Fulfilled'}
+                              </button>
+                            )}
+                            {canDecline && (
+                              <button
+                                disabled={busy}
+                                onClick={() => handleStatusChange(r.id, 'Declined')}
+                                className="px-3 py-1.5 bg-zinc-200 text-zinc-600 text-[11px] font-black uppercase tracking-wide rounded hover:bg-zinc-300 disabled:opacity-40 transition-colors"
+                              >
+                                {busy ? '…' : 'Decline'}
+                              </button>
                             )}
                             {rowErrors[r.id] && (
-                              <p className="text-[11px] text-red-600 max-w-[180px] leading-snug mt-1">
+                              <p className="text-[11px] text-red-600 max-w-[180px] leading-snug mt-0.5">
                                 ⚠ {rowErrors[r.id]}
                               </p>
                             )}
