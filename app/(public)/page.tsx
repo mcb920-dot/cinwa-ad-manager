@@ -430,10 +430,12 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto">
 
           <div className="text-center mb-16">
-            <p className="text-red-700 text-sm font-black uppercase tracking-widest mb-5">Featured Placement</p>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-zinc-950 uppercase tracking-tight leading-[0.95] mb-6">
-              How Placements Work.
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-red-700 uppercase tracking-tight leading-none mb-3">
+              Featured Placement
             </h2>
+            <p className="text-4xl sm:text-5xl lg:text-6xl font-black text-zinc-950 uppercase tracking-tight leading-[0.95] mb-6">
+              How Placements Work.
+            </p>
             <p className="text-zinc-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
               We operate a straightforward advertising model inside Northwest Arkansas&apos; largest
               contractor community. Here is what your placement includes — and what it does not.
