@@ -69,13 +69,13 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-10 pb-10 border-b border-zinc-800">
 
             {/* Brand */}
-            <div className="flex flex-col items-center sm:items-start">
+            <div>
               <Image
                 src="/logo/CINWA-footer-logo.png"
                 alt="CINWA — Contractors in Northwest Arkansas"
-                width={180}
-                height={180}
-                className="object-contain w-32 sm:w-44 h-auto"
+                width={112}
+                height={112}
+                className="object-contain w-20 sm:w-28 h-auto"
               />
             </div>
 
