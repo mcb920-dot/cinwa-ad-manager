@@ -36,24 +36,60 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
       <main className="flex-1">{children}</main>
 
-      <footer className="border-t border-zinc-200 bg-zinc-950 py-10 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div>
-            <Image
-              src="/logo/CINWA-LOGO-WHITEBG.jpg"
-              alt="CINWA"
-              width={90}
-              height={60}
-              className="object-contain h-8 w-auto"
-              style={{ mixBlendMode: 'screen' }}
-            />
-            <p className="text-zinc-500 text-xs mt-2">Contractors in Northwest Arkansas</p>
+      <footer className="bg-zinc-950 py-14 px-6 sm:px-10">
+        <div className="max-w-6xl mx-auto">
+
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-10 pb-10 border-b border-zinc-800">
+
+            {/* Brand */}
+            <div>
+              <Image
+                src="/logo/CINWA-LOGO-WHITEBG.jpg"
+                alt="CINWA"
+                width={90}
+                height={60}
+                className="object-contain h-8 w-auto"
+                style={{ mixBlendMode: 'screen' }}
+              />
+              <p className="text-zinc-500 text-[11px] mt-3 uppercase tracking-widest">
+                Contractors in Northwest Arkansas
+              </p>
+            </div>
+
+            {/* Contact */}
+            <div className="flex flex-col gap-3">
+              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-1">Contact</p>
+              <a
+                href="mailto:biz.cinwa@gmail.com"
+                className="text-sm text-zinc-300 hover:text-white transition-colors"
+              >
+                biz.cinwa@gmail.com
+              </a>
+              <a
+                href="https://www.facebook.com/CINWAbusiness/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-zinc-300 hover:text-red-500 transition-colors"
+              >
+                Facebook — CINWA Business
+              </a>
+            </div>
+
+            {/* Nav */}
+            <div className="flex flex-col gap-3">
+              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-1">Advertise</p>
+              <Link href="/availability" className="text-sm text-zinc-300 hover:text-white transition-colors">
+                Check Availability
+              </Link>
+              <Link href="/reserve" className="text-sm text-zinc-300 hover:text-red-500 transition-colors">
+                Reserve a Spot
+              </Link>
+            </div>
+
           </div>
-          <div className="flex gap-8 text-xs text-zinc-500">
-            <Link href="/availability" className="hover:text-white transition-colors">Check Availability</Link>
-            <Link href="/reserve" className="hover:text-white transition-colors">Reserve a Spot</Link>
-          </div>
-          <p className="text-zinc-600 text-xs">© {new Date().getFullYear()} CINWA</p>
+
+          <p className="text-zinc-600 text-xs pt-6">© {new Date().getFullYear()} CINWA. All rights reserved.</p>
+
         </div>
       </footer>
     </div>
