@@ -96,6 +96,7 @@ export default function CategoriesClient({ categories: initial }: { categories: 
           {categories.length === 0 ? (
             <p className="py-10 text-center text-xs text-zinc-400 font-medium">No categories yet.</p>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b border-zinc-200">
                 <tr className="bg-zinc-50">
@@ -131,6 +132,7 @@ export default function CategoriesClient({ categories: initial }: { categories: 
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

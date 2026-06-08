@@ -31,7 +31,7 @@ export default function AdminShell({
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-full overflow-auto min-w-0">
+      <div className="flex-1 flex flex-col min-h-full overflow-x-hidden min-w-0">
         {/* Mobile top bar */}
         <div className="lg:hidden sticky top-0 z-30 flex items-center gap-3 px-4 h-12 bg-zinc-950 border-b border-white/[0.08] shrink-0">
           <button

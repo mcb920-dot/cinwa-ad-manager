@@ -138,6 +138,7 @@ export default function DashboardClient() {
             {stats.partnerSpots.length === 0 ? (
               <EmptyState text="No partner spots for this month." />
             ) : (
+              <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="border-b border-zinc-200">
                   <tr className="bg-zinc-50">
@@ -157,6 +158,7 @@ export default function DashboardClient() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </section>
@@ -168,6 +170,7 @@ export default function DashboardClient() {
             {stats.coverSponsors.length === 0 ? (
               <EmptyState text="No cover sponsors for this month." />
             ) : (
+              <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="border-b border-zinc-200">
                   <tr className="bg-zinc-50">
@@ -187,6 +190,7 @@ export default function DashboardClient() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </section>
