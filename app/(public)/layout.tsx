@@ -3,20 +3,21 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://contractorsinnwa.com'),
   title: 'Contractors in Northwest Arkansas',
   description: "Premium advertising opportunities inside Northwest Arkansas' largest contractor community.",
   openGraph: {
     type: 'website',
     url: 'https://contractorsinnwa.com',
-    siteName: 'CINWA',
+    siteName: 'Contractors in Northwest Arkansas',
     title: 'Contractors in Northwest Arkansas',
     description: "Premium advertising opportunities inside Northwest Arkansas' largest contractor community.",
     images: [
       {
-        url: 'https://contractorsinnwa.com/logo/Hero-photo.png',
-        width: 1731,
-        height: 909,
-        alt: 'CINWA — Contractors in Northwest Arkansas',
+        url: '/logo/social-preview.png',
+        width: 1200,
+        height: 630,
+        alt: 'CINWA advertising opportunities',
       },
     ],
   },
@@ -24,7 +25,12 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Contractors in Northwest Arkansas',
     description: "Premium advertising opportunities inside Northwest Arkansas' largest contractor community.",
-    images: ['https://contractorsinnwa.com/logo/Hero-photo.png'],
+    images: ['/logo/social-preview.png'],
+  },
+  icons: {
+    icon: '/logo/CINWA-favicon.png',
+    shortcut: '/logo/CINWA-favicon.png',
+    apple: '/logo/CINWA-favicon.png',
   },
 }
 
