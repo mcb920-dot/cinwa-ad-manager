@@ -10,10 +10,10 @@ export const metadata: Metadata = {
     url: 'https://contractorsinnwa.com',
     siteName: 'CINWA',
     title: 'Contractors in Northwest Arkansas',
-    description: 'Get your business seen by homeowners and contractors across Northwest Arkansas.',
+    description: "Premium advertising opportunities inside Northwest Arkansas' largest contractor community.",
     images: [
       {
-        url: '/logo/Hero-photo.png',
+        url: 'https://contractorsinnwa.com/logo/Hero-photo.png',
         width: 1731,
         height: 909,
         alt: 'CINWA — Contractors in Northwest Arkansas',
@@ -23,8 +23,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Contractors in Northwest Arkansas',
-    description: 'Get your business seen by homeowners and contractors across Northwest Arkansas.',
-    images: ['/logo/Hero-photo.png'],
+    description: "Premium advertising opportunities inside Northwest Arkansas' largest contractor community.",
+    images: ['https://contractorsinnwa.com/logo/Hero-photo.png'],
   },
 }
 
