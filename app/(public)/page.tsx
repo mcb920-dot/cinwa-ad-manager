@@ -346,14 +346,14 @@ export default async function HomePage() {
           <div className="max-w-6xl mx-auto">
 
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4">
-              <div>
-                <p className="text-red-700 text-xs font-black uppercase tracking-[0.3em] mb-3">Open Inventory</p>
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-zinc-950 uppercase tracking-tight leading-none">
-                  Available Now.
-                </h2>
-              </div>
-              <p className="text-sm font-black uppercase tracking-widest text-zinc-400 shrink-0 sm:mb-1">{data.month.name}</p>
+            <div className="text-center mb-4">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-red-700 uppercase tracking-tight leading-none mb-3">
+                Open Inventory
+              </h2>
+              <p className="text-4xl sm:text-5xl lg:text-6xl font-black text-zinc-950 uppercase tracking-tight leading-none">
+                Available Now.
+              </p>
+              <p className="text-sm font-black uppercase tracking-widest text-zinc-400 mt-5">{data.month.name}</p>
             </div>
 
             {/* Inventory counters */}
@@ -426,79 +426,64 @@ export default async function HomePage() {
       )}
 
       {/* ── HOW PLACEMENTS WORK ──────────────────────────────────── */}
-      <section className="bg-zinc-950 py-24 px-6 sm:px-10 border-t-4 border-red-700">
+      <section className="bg-white py-24 px-6 sm:px-10 border-t-4 border-zinc-950">
         <div className="max-w-6xl mx-auto">
 
-          <p className="text-red-600 text-xs font-black uppercase tracking-[0.3em] mb-5">Featured Placement</p>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white uppercase tracking-tight leading-[0.95] mb-4 max-w-3xl">
-            How Placements Work.
-          </h2>
-          <p className="text-zinc-400 text-base sm:text-lg max-w-2xl mb-14 leading-relaxed">
-            We operate a straightforward advertising model inside Northwest Arkansas&apos; largest
-            contractor community. Here is what your placement includes — and what it does not.
-          </p>
+          <div className="text-center mb-16">
+            <p className="text-red-700 text-xs font-black uppercase tracking-[0.3em] mb-5">Featured Placement</p>
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-zinc-950 uppercase tracking-tight leading-[0.95] mb-6">
+              How Placements Work.
+            </h2>
+            <p className="text-zinc-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+              We operate a straightforward advertising model inside Northwest Arkansas&apos; largest
+              contractor community. Here is what your placement includes — and what it does not.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-200">
 
-            <div className="bg-zinc-900 border border-zinc-800 p-7 flex flex-col gap-5">
-              <div className="w-10 h-10 bg-red-700 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-white font-black text-sm uppercase tracking-wide mb-3">Paid Visibility</p>
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Featured placement is premium advertising space that puts your business in front
-                  of 17,000+ Northwest Arkansas community members each month.
-                </p>
-              </div>
+            <div className="bg-white p-8 flex flex-col gap-5">
+              <p className="text-zinc-950 font-black text-xl uppercase tracking-tight leading-tight">
+                Paid Visibility
+              </p>
+              <div className="w-8 h-0.5 bg-red-700" />
+              <p className="text-zinc-500 text-sm leading-relaxed">
+                Featured placement is premium advertising space that puts your business in front
+                of 17,000+ Northwest Arkansas community members each month.
+              </p>
             </div>
 
-            <div className="bg-zinc-900 border border-zinc-800 p-7 flex flex-col gap-5">
-              <div className="w-10 h-10 bg-red-700 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-white font-black text-sm uppercase tracking-wide mb-3">What&apos;s Included</p>
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Monthly cover photo placement, partner directory listing, and promotional
-                  exposure throughout the community — all month, every month you reserve.
-                </p>
-              </div>
+            <div className="bg-white p-8 flex flex-col gap-5">
+              <p className="text-zinc-950 font-black text-xl uppercase tracking-tight leading-tight">
+                What&apos;s Included
+              </p>
+              <div className="w-8 h-0.5 bg-red-700" />
+              <p className="text-zinc-500 text-sm leading-relaxed">
+                Monthly cover photo placement, partner directory listing, and promotional
+                exposure throughout the community — all month, every month you reserve.
+              </p>
             </div>
 
-            <div className="bg-zinc-900 border border-zinc-800 p-7 flex flex-col gap-5">
-              <div className="w-10 h-10 bg-red-700 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-white font-black text-sm uppercase tracking-wide mb-3">Honest Disclosure</p>
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Featured placement increases your visibility. It does not guarantee jobs,
-                  referrals, or customer selection. Homeowners choose who they hire.
-                </p>
-              </div>
+            <div className="bg-white p-8 flex flex-col gap-5">
+              <p className="text-zinc-950 font-black text-xl uppercase tracking-tight leading-tight">
+                Honest Disclosure
+              </p>
+              <div className="w-8 h-0.5 bg-red-700" />
+              <p className="text-zinc-500 text-sm leading-relaxed">
+                Featured placement increases your visibility. It does not guarantee jobs,
+                referrals, or customer selection. Homeowners choose who they hire.
+              </p>
             </div>
 
-            <div className="bg-zinc-900 border border-zinc-800 p-7 flex flex-col gap-5">
-              <div className="w-10 h-10 bg-red-700 flex items-center justify-center shrink-0">
-                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-white font-black text-sm uppercase tracking-wide mb-3">Community First</p>
-                <p className="text-zinc-400 text-sm leading-relaxed">
-                  Our goal is to support local businesses while maintaining a trustworthy,
-                  unbiased environment for every homeowner and contractor in Northwest Arkansas.
-                </p>
-              </div>
+            <div className="bg-white p-8 flex flex-col gap-5">
+              <p className="text-zinc-950 font-black text-xl uppercase tracking-tight leading-tight">
+                Community First
+              </p>
+              <div className="w-8 h-0.5 bg-red-700" />
+              <p className="text-zinc-500 text-sm leading-relaxed">
+                Our goal is to support local businesses while maintaining a trustworthy,
+                unbiased environment for every homeowner and contractor in Northwest Arkansas.
+              </p>
             </div>
 
           </div>
