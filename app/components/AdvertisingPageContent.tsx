@@ -23,9 +23,9 @@ async function getPageData() {
     db.from('cover_sponsors').select('id, company_name, position').eq('month_id', month.id).eq('active', true).order('company_name'),
     db.from('categories').select('id, name').eq('active', true).order('name'),
     db.from('partner_spots').select('category_id').eq('month_id', month.id).eq('active', true),
-    db.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', month.id).eq('package_type', 'featured_partner').eq('status', 'Paid'),
-    db.from('reservations').select('category_id').eq('month_id', month.id).eq('package_type', 'featured_partner').eq('status', 'Paid'),
-    db.from('reservations').select('company_name').eq('month_id', month.id).eq('package_type', 'cover_sponsor').eq('status', 'Paid'),
+    db.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', month.id).eq('package_type', 'featured_partner').in('status', ['Paid', 'Fulfilled']),
+    db.from('reservations').select('category_id').eq('month_id', month.id).eq('package_type', 'featured_partner').in('status', ['Paid', 'Fulfilled']),
+    db.from('reservations').select('company_name').eq('month_id', month.id).eq('package_type', 'cover_sponsor').in('status', ['Paid', 'Fulfilled']),
   ])
 
   const categories = (categoryRes.data ?? []) as { id: number; name: string }[]

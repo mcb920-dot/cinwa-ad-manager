@@ -28,11 +28,11 @@ export default async function AvailabilityPage() {
   if (firstMonthId) {
     const [partnerCount, paidPartnerCount, coverCount, paidCoverCount, takenSpots, paidTakenSpots] = await Promise.all([
       db.from('partner_spots').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('active', true),
-      db.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('package_type', 'featured_partner').eq('status', 'Paid'),
+      db.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('package_type', 'featured_partner').in('status', ['Paid', 'Fulfilled']),
       db.from('cover_sponsors').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('active', true),
-      db.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('package_type', 'cover_sponsor').eq('status', 'Paid'),
+      db.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('package_type', 'cover_sponsor').in('status', ['Paid', 'Fulfilled']),
       db.from('partner_spots').select('category_id').eq('month_id', firstMonthId).eq('active', true),
-      db.from('reservations').select('category_id').eq('month_id', firstMonthId).eq('package_type', 'featured_partner').eq('status', 'Paid'),
+      db.from('reservations').select('category_id').eq('month_id', firstMonthId).eq('package_type', 'featured_partner').in('status', ['Paid', 'Fulfilled']),
     ])
     initialData = {
       partnerUsed: (partnerCount.count ?? 0) + (paidPartnerCount.count ?? 0),

@@ -58,7 +58,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
           .select('*', { count: 'exact', head: true })
           .eq('month_id', monthId)
           .eq('package_type', 'featured_partner')
-          .eq('status', 'Paid'),
+          .in('status', ['Paid', 'Fulfilled']),
         // Taken categories: partner_spots + paid reservations
         supabase
           .from('partner_spots')
@@ -70,7 +70,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
           .select('category_id')
           .eq('month_id', monthId)
           .eq('package_type', 'featured_partner')
-          .eq('status', 'Paid'),
+          .in('status', ['Paid', 'Fulfilled']),
       ]).then(([spotCountRes, resCountRes, takenSpotsRes, takenResRes]) => {
         const totalUsed = (spotCountRes.count ?? 0) + (resCountRes.count ?? 0)
         if (totalUsed >= PARTNER_LIMIT) {
@@ -97,7 +97,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
           .select('*', { count: 'exact', head: true })
           .eq('month_id', monthId)
           .eq('package_type', 'cover_sponsor')
-          .eq('status', 'Paid'),
+          .in('status', ['Paid', 'Fulfilled']),
       ]).then(([spotsRes, resRes]) => {
         const totalUsed = (spotsRes.count ?? 0) + (resRes.count ?? 0)
         if (totalUsed >= COVER_LIMIT) {

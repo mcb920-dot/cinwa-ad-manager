@@ -45,11 +45,11 @@ export default function AvailabilityClient({ months, categories, initialMonthId,
     setLoading(true)
     const [partnerCount, paidPartnerCount, coverCount, paidCoverCount, takenSpots, paidTakenSpots] = await Promise.all([
       supabase.from('partner_spots').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('active', true),
-      supabase.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('package_type', 'featured_partner').eq('status', 'Paid'),
+      supabase.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('package_type', 'featured_partner').in('status', ['Paid', 'Fulfilled']),
       supabase.from('cover_sponsors').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('active', true),
-      supabase.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('package_type', 'cover_sponsor').eq('status', 'Paid'),
+      supabase.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('package_type', 'cover_sponsor').in('status', ['Paid', 'Fulfilled']),
       supabase.from('partner_spots').select('category_id').eq('month_id', monthId).eq('active', true),
-      supabase.from('reservations').select('category_id, package_type, status').eq('month_id', monthId).eq('status', 'Paid'),
+      supabase.from('reservations').select('category_id, package_type, status').eq('month_id', monthId).in('status', ['Paid', 'Fulfilled']),
     ])
     console.log('[cinwa] availability debug', {
       monthId,
