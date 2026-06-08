@@ -59,7 +59,7 @@ export default async function AdvertisingPageContent() {
   return (
     <>
       {/* ── HERO ─────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden" style={{ height: 'clamp(580px, 75vh, 800px)' }}>
+      <section className="relative overflow-hidden" style={{ height: 'clamp(500px, 70vh, 800px)' }}>
         <Image
           src="/logo/Hero-photo.png"
           alt=""
@@ -69,15 +69,15 @@ export default async function AdvertisingPageContent() {
           className="object-cover object-center"
         />
         <div className="absolute inset-0 bg-black/55" />
-        <div className="absolute inset-0 flex items-center">
+        <div className="absolute inset-0 flex items-start pt-14 sm:items-center sm:pt-0">
           <div className="w-full max-w-5xl mx-auto px-6 sm:px-10 text-center">
-            <h2 className="text-red-400 text-xl sm:text-2xl font-black uppercase tracking-[0.2em] mb-6">
+            <h2 className="text-red-400 text-xl sm:text-2xl font-black uppercase tracking-[0.2em] mb-3 sm:mb-6">
               Contractors in Northwest Arkansas
             </h2>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.0] tracking-tight mb-6 uppercase">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.0] tracking-tight mb-3 sm:mb-6 uppercase">
               Reach 17,000+ Northwest Arkansas Homeowners &amp; Contractors
             </h1>
-            <p className="text-white/70 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
+            <p className="text-white/70 text-lg leading-relaxed max-w-2xl mx-auto mb-6 sm:mb-10">
               Advertising opportunities inside one of Northwest Arkansas&apos; largest contractor communities.
               One business per category. Limited monthly placements.
             </p>
