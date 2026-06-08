@@ -18,22 +18,34 @@ async function getPageData() {
   const month = months?.[0] ?? null
   if (!month) return null
 
-  const [partnerCountRes, coverSponsorRes, categoryRes, takenRes] = await Promise.all([
+  const [partnerCountRes, coverSponsorRes, categoryRes, takenRes, paidPartnerCountRes, paidPartnerCatsRes, paidCoverRes] = await Promise.all([
     db.from('partner_spots').select('*', { count: 'exact', head: true }).eq('month_id', month.id).eq('active', true),
     db.from('cover_sponsors').select('id, company_name, position').eq('month_id', month.id).eq('active', true).order('company_name'),
     db.from('categories').select('id, name').eq('active', true).order('name'),
     db.from('partner_spots').select('category_id').eq('month_id', month.id).eq('active', true),
+    db.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', month.id).eq('package_type', 'featured_partner').eq('status', 'Paid'),
+    db.from('reservations').select('category_id').eq('month_id', month.id).eq('package_type', 'featured_partner').eq('status', 'Paid'),
+    db.from('reservations').select('company_name').eq('month_id', month.id).eq('package_type', 'cover_sponsor').eq('status', 'Paid'),
   ])
 
   const categories = (categoryRes.data ?? []) as { id: number; name: string }[]
-  const takenIds   = new Set((takenRes.data ?? []).map((r: { category_id: number }) => r.category_id))
+  const takenIds = new Set([
+    ...(takenRes.data ?? []).map((r: { category_id: number }) => r.category_id),
+    ...(paidPartnerCatsRes.data ?? []).map((r: { category_id: number }) => r.category_id),
+  ])
+  const activeSponsors = (coverSponsorRes.data ?? []) as { id: number; company_name: string; position: string }[]
+  const paidCoverSponsors = (paidCoverRes.data ?? []).map((r: { company_name: string }, i: number) => ({
+    id: -(i + 1),
+    company_name: r.company_name,
+    position: '',
+  }))
 
   return {
     month,
-    partnerCount:   partnerCountRes.count ?? 0,
-    coverSponsors:  (coverSponsorRes.data ?? []) as { id: number; company_name: string; position: string }[],
-    available:      categories.filter(c => !takenIds.has(c.id)),
-    taken:          categories.filter(c =>  takenIds.has(c.id)),
+    partnerCount:  (partnerCountRes.count ?? 0) + (paidPartnerCountRes.count ?? 0),
+    coverSponsors: [...activeSponsors, ...paidCoverSponsors],
+    available:     categories.filter(c => !takenIds.has(c.id)),
+    taken:         categories.filter(c =>  takenIds.has(c.id)),
   }
 }
 

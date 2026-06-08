@@ -26,15 +26,21 @@ export default async function AvailabilityPage() {
   let initialData = { partnerUsed: 0, coverUsed: 0, takenCategoryIds: [] as number[] }
 
   if (firstMonthId) {
-    const [partnerCount, coverCount, takenSpots] = await Promise.all([
+    const [partnerCount, paidPartnerCount, coverCount, paidCoverCount, takenSpots, paidTakenSpots] = await Promise.all([
       db.from('partner_spots').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('active', true),
+      db.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('package_type', 'featured_partner').eq('status', 'Paid'),
       db.from('cover_sponsors').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('active', true),
+      db.from('reservations').select('*', { count: 'exact', head: true }).eq('month_id', firstMonthId).eq('package_type', 'cover_sponsor').eq('status', 'Paid'),
       db.from('partner_spots').select('category_id').eq('month_id', firstMonthId).eq('active', true),
+      db.from('reservations').select('category_id').eq('month_id', firstMonthId).eq('package_type', 'featured_partner').eq('status', 'Paid'),
     ])
     initialData = {
-      partnerUsed: partnerCount.count ?? 0,
-      coverUsed: coverCount.count ?? 0,
-      takenCategoryIds: takenSpots.data?.map((s: { category_id: number }) => s.category_id) ?? [],
+      partnerUsed: (partnerCount.count ?? 0) + (paidPartnerCount.count ?? 0),
+      coverUsed: (coverCount.count ?? 0) + (paidCoverCount.count ?? 0),
+      takenCategoryIds: [
+        ...(takenSpots.data?.map((s: { category_id: number }) => s.category_id) ?? []),
+        ...(paidTakenSpots.data?.map((r: { category_id: number }) => r.category_id) ?? []),
+      ],
     }
   }
 
