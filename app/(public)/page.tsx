@@ -357,7 +357,7 @@ export default async function HomePage() {
             </div>
 
             {/* Inventory counters */}
-            <div className="grid grid-cols-2 gap-3 mt-10 mb-14 max-w-xl">
+            <div className="grid grid-cols-2 gap-3 mt-10 mb-14 max-w-xl mx-auto">
               <div className="bg-zinc-950 p-6 border-l-4 border-red-700">
                 <p className="text-[3.5rem] font-black text-white leading-none">{partnerOpen}</p>
                 <p className="text-xs font-black uppercase tracking-widest text-red-600 mt-2">of 20 Partner</p>
@@ -430,7 +430,7 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto">
 
           <div className="text-center mb-16">
-            <p className="text-red-700 text-xs font-black uppercase tracking-[0.3em] mb-5">Featured Placement</p>
+            <p className="text-red-700 text-sm font-black uppercase tracking-widest mb-5">Featured Placement</p>
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-zinc-950 uppercase tracking-tight leading-[0.95] mb-6">
               How Placements Work.
             </h2>
@@ -440,9 +440,9 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
 
-            <div className="bg-white p-8 flex flex-col gap-5">
+            <div className="border border-zinc-200 p-8 flex flex-col gap-5">
               <p className="text-zinc-950 font-black text-xl uppercase tracking-tight leading-tight">
                 Paid Visibility
               </p>
@@ -453,7 +453,7 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white p-8 flex flex-col gap-5">
+            <div className="border border-zinc-200 p-8 flex flex-col gap-5">
               <p className="text-zinc-950 font-black text-xl uppercase tracking-tight leading-tight">
                 What&apos;s Included
               </p>
@@ -464,7 +464,7 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white p-8 flex flex-col gap-5">
+            <div className="border border-zinc-200 p-8 flex flex-col gap-5">
               <p className="text-zinc-950 font-black text-xl uppercase tracking-tight leading-tight">
                 Honest Disclosure
               </p>
@@ -475,7 +475,7 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white p-8 flex flex-col gap-5">
+            <div className="border border-zinc-200 p-8 flex flex-col gap-5">
               <p className="text-zinc-950 font-black text-xl uppercase tracking-tight leading-tight">
                 Community First
               </p>
