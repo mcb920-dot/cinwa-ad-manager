@@ -69,18 +69,14 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-10 pb-10 border-b border-zinc-800">
 
             {/* Brand */}
-            <div>
+            <div className="flex flex-col items-center sm:items-start">
               <Image
-                src="/logo/CINWA-LOGO-WHITEBG.jpg"
-                alt="CINWA"
-                width={90}
-                height={60}
-                className="object-contain h-8 w-auto"
-                style={{ mixBlendMode: 'screen' }}
+                src="/logo/CINWA-footer-logo.png"
+                alt="CINWA — Contractors in Northwest Arkansas"
+                width={180}
+                height={180}
+                className="object-contain w-32 sm:w-44 h-auto"
               />
-              <p className="text-zinc-500 text-[11px] mt-3 uppercase tracking-widest">
-                Contractors in Northwest Arkansas
-              </p>
             </div>
 
             {/* Contact */}
@@ -115,7 +111,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
           </div>
 
-          <p className="text-zinc-600 text-xs pt-6">© {new Date().getFullYear()} CINWA. All rights reserved.</p>
+          <p className="text-zinc-600 text-xs pt-6">Copyright © {new Date().getFullYear()} Contractors in Northwest Arkansas</p>
 
         </div>
       </footer>
