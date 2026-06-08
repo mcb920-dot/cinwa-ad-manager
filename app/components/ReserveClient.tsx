@@ -47,20 +47,60 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
 
     if (form.packageType === 'featured_partner') {
       Promise.all([
-        supabase.from('partner_spots').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('active', true),
-        supabase.from('partner_spots').select('category_id').eq('month_id', monthId).eq('active', true),
-      ]).then(([countRes, takenRes]) => {
-        if ((countRes.count ?? 0) >= PARTNER_LIMIT) {
+        // Capacity: count active partner_spots + paid featured_partner reservations
+        supabase
+          .from('partner_spots')
+          .select('*', { count: 'exact', head: true })
+          .eq('month_id', monthId)
+          .eq('active', true),
+        supabase
+          .from('reservations')
+          .select('*', { count: 'exact', head: true })
+          .eq('month_id', monthId)
+          .eq('package_type', 'featured_partner')
+          .eq('status', 'Paid'),
+        // Taken categories: partner_spots + paid reservations
+        supabase
+          .from('partner_spots')
+          .select('category_id')
+          .eq('month_id', monthId)
+          .eq('active', true),
+        supabase
+          .from('reservations')
+          .select('category_id')
+          .eq('month_id', monthId)
+          .eq('package_type', 'featured_partner')
+          .eq('status', 'Paid'),
+      ]).then(([spotCountRes, resCountRes, takenSpotsRes, takenResRes]) => {
+        const totalUsed = (spotCountRes.count ?? 0) + (resCountRes.count ?? 0)
+        if (totalUsed >= PARTNER_LIMIT) {
           setCapacityError('This month is full. Please choose another month.')
         } else {
-          const takenIds = new Set(takenRes.data?.map((s: { category_id: number }) => s.category_id) ?? [])
+          const takenIds = new Set([
+            ...(takenSpotsRes.data?.map((s: { category_id: number }) => s.category_id) ?? []),
+            ...(takenResRes.data?.map((r: { category_id: number }) => r.category_id) ?? []),
+          ])
           setAvailableCategories(categories.filter((c) => !takenIds.has(c.id)))
         }
         setCheckingAvailability(false)
       })
     } else {
-      supabase.from('cover_sponsors').select('*', { count: 'exact', head: true }).eq('month_id', monthId).eq('active', true).then(({ count }) => {
-        if ((count ?? 0) >= COVER_LIMIT) {
+      // Cover sponsor: count active spots + paid reservations
+      Promise.all([
+        supabase
+          .from('cover_sponsors')
+          .select('*', { count: 'exact', head: true })
+          .eq('month_id', monthId)
+          .eq('active', true),
+        supabase
+          .from('reservations')
+          .select('*', { count: 'exact', head: true })
+          .eq('month_id', monthId)
+          .eq('package_type', 'cover_sponsor')
+          .eq('status', 'Paid'),
+      ]).then(([spotsRes, resRes]) => {
+        const totalUsed = (spotsRes.count ?? 0) + (resRes.count ?? 0)
+        if (totalUsed >= COVER_LIMIT) {
           setCapacityError('Cover sponsor positions are full for this month.')
         }
         setCheckingAvailability(false)
@@ -74,7 +114,6 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
     setSubmitting(true)
     setSubmitError(null)
 
-    // 1. Save to Supabase — source of truth
     const { error: err } = await supabase.from('reservations').insert([{
       month_id:     Number(form.monthId),
       package_type: form.packageType,
@@ -99,7 +138,7 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
       return
     }
 
-    // 2. Notify via Formspree — best-effort, never blocks success
+    // Notify via Formspree — best-effort, never blocks success
     const monthName    = months.find((m) => String(m.id) === form.monthId)?.name ?? form.monthId
     const categoryName = categories.find((c) => String(c.id) === form.categoryId)?.name ?? ''
     const packageLabel = form.packageType === 'featured_partner'
@@ -153,13 +192,12 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
     )
   }
 
-  const selectedMonth   = months.find((m) => String(m.id) === form.monthId)
+  const selectedMonth     = months.find((m) => String(m.id) === form.monthId)
   const isFeaturedPartner = form.packageType === 'featured_partner'
-  const canSubmit       = !capacityError && !checkingAvailability && form.packageType !== ''
+  const canSubmit         = !capacityError && !checkingAvailability && form.packageType !== ''
 
   return (
     <div className="bg-zinc-950 min-h-full">
-      {/* Page header */}
       <div className="bg-zinc-950 border-b border-zinc-800">
         <div className="max-w-5xl mx-auto px-6 pt-16 pb-14 text-center">
           <p className="text-red-600 text-xs font-black uppercase tracking-[0.3em] mb-5">
@@ -174,11 +212,9 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
         </div>
       </div>
 
-      {/* Form */}
       <div className="max-w-2xl mx-auto px-6 py-14">
         <form onSubmit={handleSubmit} className="space-y-8">
 
-          {/* Placement */}
           <div className="space-y-5">
             <SectionLabel text="Placement" />
 
@@ -209,7 +245,6 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
               </select>
             </div>
 
-            {/* Capacity feedback */}
             {form.monthId && form.packageType && (
               checkingAvailability ? (
                 <p className="text-zinc-500 text-sm">Checking availability…</p>
@@ -220,7 +255,6 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
               ) : null
             )}
 
-            {/* Category */}
             {isFeaturedPartner && !capacityError && !checkingAvailability && form.monthId && (
               <div>
                 <Label text="Category" required />
@@ -248,7 +282,6 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
 
           <Divider />
 
-          {/* Business info */}
           <div className="space-y-5">
             <SectionLabel text="Business Information" />
             <div>
@@ -267,7 +300,6 @@ export default function ReserveClient({ months, categories, initialMonthId }: Pr
 
           <Divider />
 
-          {/* Contact info */}
           <div className="space-y-5">
             <SectionLabel text="Contact Information" />
             <div>
